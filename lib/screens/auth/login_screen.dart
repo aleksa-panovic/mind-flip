@@ -122,7 +122,7 @@ class LoginScreen extends StatelessWidget {
                         onPressed: () {
                           Navigator.pushReplacementNamed(
                             context,
-                            '/home-guest',
+                            '/home-user',
                           );
                         },
                         style: ElevatedButton.styleFrom(

@@ -160,10 +160,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         textInputAction: TextInputAction.next,
                         decoration: _dec('Username', 'YourGamertag'),
                         validator: (v) {
-                          if (v == null || v.trim().isEmpty)
+                          if (v == null || v.trim().isEmpty) {
                             return 'Username je obavezan.';
-                          if (v.trim().length < 3)
+                          }
+                          if (v.trim().length < 3) {
                             return 'Minimum 3 karaktera.';
+                          }
                           return null;
                         },
                       ),
@@ -184,8 +186,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         textInputAction: TextInputAction.next,
                         decoration: _dec('Email', 'your@email.com'),
                         validator: (v) {
-                          if (v == null || v.trim().isEmpty)
+                          if (v == null || v.trim().isEmpty) {
                             return 'Email je obavezan.';
+                          }
                           final ok = RegExp(
                             r'^[^@]+@[^@]+\.[^@]+',
                           ).hasMatch(v.trim());
@@ -222,8 +225,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                         validator: (v) {
-                          if (v == null || v.isEmpty)
+                          if (v == null || v.isEmpty) {
                             return 'Password je obavezan.';
+                          }
                           if (v.length < 8) return 'Minimum 8 karaktera.';
                           return null;
                         },
@@ -259,10 +263,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                         validator: (v) {
-                          if (v == null || v.isEmpty)
+                          if (v == null || v.isEmpty) {
                             return 'Potvrda lozinke je obavezna.';
-                          if (v != _passCtrl.text)
+                          }
+                          if (v != _passCtrl.text) {
                             return 'Lozinke se ne poklapaju.';
+                          }
                           return null;
                         },
                       ),

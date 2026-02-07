@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'screens/splash/splash_screen.dart';
 import 'screens/home/home_guest_screen.dart';
+import 'screens/home/home_user_screen.dart';
+import 'screens/game/game_4x4_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 
@@ -34,6 +36,8 @@ class MindFlipApp extends StatelessWidget {
         '/register': (context) => const RegisterScreen(),
 
         '/home-guest': (context) => const HomeGuestScreen(),
+        '/home-user': (context) => const HomeUserScreen(),
+        '/game-4x4': (context) => const Game4x4Screen(),
       },
     );
   }

@@ -37,7 +37,7 @@ class _SplashScreenState extends State<SplashScreen>
 
       if (progress >= 1) {
         t.cancel();
-        Navigator.pushReplacementNamed(context, '/login');
+        Navigator.pushReplacementNamed(context, '/home-guest');
       }
     });
   }
