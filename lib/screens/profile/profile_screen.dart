@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
+import '../../widgets/gradient_header.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -58,48 +59,18 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF6F79E8), Color(0xFF6A5AE0), Color(0xFF6A49C9)],
+      child: GradientHeader(
+        title: 'Profile',
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        leading: _HeaderIcon(
+          icon: Icons.chevron_left,
+          onTap: () => Navigator.pop(context),
         ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(26),
-          bottomRight: Radius.circular(26),
+        trailing: _HeaderIcon(
+          icon: Icons.edit_outlined,
+          onTap: () {},
         ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            Row(
-              children: [
-                _HeaderIcon(
-                  icon: Icons.chevron_left,
-                  onTap: () => Navigator.pop(context),
-                ),
-                const Spacer(),
-                const Text(
-                  'Profile',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const Spacer(),
-                _HeaderIcon(
-                  icon: Icons.edit_outlined,
-                  onTap: () {},
-                ),
-              ],
-            ),
-            const SizedBox(height: 18),
-            const _AvatarBlock(),
-          ],
-        ),
+        bottom: const _AvatarBlock(),
       ),
     );
   }

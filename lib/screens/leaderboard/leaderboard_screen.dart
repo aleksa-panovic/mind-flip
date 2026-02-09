@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../widgets/gradient_header.dart';
+
 class LeaderboardScreen extends StatelessWidget {
   const LeaderboardScreen({super.key});
 
@@ -33,50 +35,17 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF6F79E8), Color(0xFF6A5AE0), Color(0xFF6A49C9)],
-        ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(26),
-          bottomRight: Radius.circular(26),
-        ),
+    return GradientHeader(
+      title: 'Leaderboard',
+      leading: _HeaderIcon(
+        icon: Icons.chevron_left,
+        onTap: () => Navigator.pop(context),
       ),
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            Row(
-              children: [
-                _HeaderIcon(
-                  icon: Icons.chevron_left,
-                  onTap: () => Navigator.pop(context),
-                ),
-                const Spacer(),
-                const Text(
-                  'Leaderboard',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const Spacer(),
-                _HeaderIcon(
-                  icon: Icons.filter_alt_outlined,
-                  onTap: () {},
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            const _Tabs(),
-          ],
-        ),
+      trailing: _HeaderIcon(
+        icon: Icons.filter_alt_outlined,
+        onTap: () {},
       ),
+      bottom: const _Tabs(),
     );
   }
 }

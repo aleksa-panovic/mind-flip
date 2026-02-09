@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../widgets/gradient_header.dart';
+
 class InventoryScreen extends StatelessWidget {
   const InventoryScreen({super.key});
 
@@ -45,45 +47,14 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF6F79E8), Color(0xFF6A5AE0), Color(0xFF6A49C9)],
+      child: GradientHeader(
+        title: 'My Collection',
+        leading: _HeaderIcon(
+          icon: Icons.chevron_left,
+          onTap: () => Navigator.pop(context),
         ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(26),
-          bottomRight: Radius.circular(26),
-        ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            Row(
-              children: [
-                _HeaderIcon(
-                  icon: Icons.chevron_left,
-                  onTap: () => Navigator.pop(context),
-                ),
-                const Spacer(),
-                const Text(
-                  'My Collection',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const Spacer(),
-                const SizedBox(width: 40),
-              ],
-            ),
-            const SizedBox(height: 16),
-            const _Tabs(),
-          ],
-        ),
+        trailing: const SizedBox(width: 40),
+        bottom: const _Tabs(),
       ),
     );
   }

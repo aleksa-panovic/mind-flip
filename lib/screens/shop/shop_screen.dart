@@ -36,8 +36,22 @@ class _TitleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: const [
-        Text(
+      children: [
+        InkWell(
+          onTap: () => Navigator.pop(context),
+          borderRadius: BorderRadius.circular(999),
+          child: Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF0F1F7),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: const Icon(Icons.chevron_left, size: 20),
+          ),
+        ),
+        const SizedBox(width: 10),
+        const Text(
           'Shop',
           style: TextStyle(
             color: Color(0xFF2F2B3A),
