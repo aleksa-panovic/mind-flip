@@ -60,6 +60,9 @@ flutter:
     - assets/back_skins/
     - assets/card_skins/
     - assets/card_skins/emoji_skin/
+    - assets/card_skins/animal_skin/
+    - assets/card_skins/space_skin/
+    - assets/card_skins/sport_skin/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

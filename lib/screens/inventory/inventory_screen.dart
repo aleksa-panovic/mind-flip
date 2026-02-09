@@ -19,18 +19,18 @@ class InventoryScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _SectionHeader(
-                    title: 'Card Skins (8/24)',
+                    title: 'Card Skins',
                     action: 'View All',
                   ),
                   SizedBox(height: 12),
                   _CardSkinGrid(),
                   SizedBox(height: 22),
                   _SectionHeader(
-                    title: 'Themes (3/12)',
+                    title: 'Card Back Skins',
                     action: 'View All',
                   ),
                   SizedBox(height: 12),
-                  _ThemeGrid(),
+                  _BackSkinGrid(),
                 ],
               ),
             ),
@@ -181,15 +181,22 @@ class _CardSkinGrid extends StatelessWidget {
       childAspectRatio: 0.9,
       children: const [
         _SkinTile(
-          title: 'Classic',
-          icon: Icons.crop_portrait,
+          title: 'Emoji (Default)',
+          assetPath: 'assets/card_skins/emoji_skin/e1.png',
           isSelected: true,
         ),
-        _SkinTile(title: 'Ocean', icon: Icons.water_drop),
-        _SkinTile(title: 'Fire', icon: Icons.local_fire_department),
-        _SkinTile(title: 'Ice', icon: Icons.ac_unit),
-        _SkinTile(title: 'Rainbow', icon: Icons.color_lens),
-        _SkinTile(title: 'Neon', icon: Icons.palette),
+        _SkinTile(
+          title: 'Animal',
+          assetPath: 'assets/card_skins/animal_skin/a1.png',
+        ),
+        _SkinTile(
+          title: 'Space',
+          assetPath: 'assets/card_skins/space_skin/s1.png',
+        ),
+        _SkinTile(
+          title: 'Sport',
+          assetPath: 'assets/card_skins/sport_skin/Sp1.png',
+        ),
       ],
     );
   }
@@ -198,12 +205,14 @@ class _CardSkinGrid extends StatelessWidget {
 class _SkinTile extends StatelessWidget {
   const _SkinTile({
     required this.title,
-    required this.icon,
+    this.icon,
+    this.assetPath,
     this.isSelected = false,
   });
 
   final String title;
-  final IconData icon;
+  final IconData? icon;
+  final String? assetPath;
   final bool isSelected;
 
   @override
@@ -237,7 +246,9 @@ class _SkinTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Center(
-                  child: Icon(icon, color: const Color(0xFF6A5AE0), size: 28),
+                  child: assetPath != null
+                      ? Image.asset(assetPath!, width: 36, height: 36)
+                      : Icon(icon, color: const Color(0xFF6A5AE0), size: 28),
                 ),
               ),
               if (isSelected)
@@ -268,8 +279,8 @@ class _SkinTile extends StatelessWidget {
   }
 }
 
-class _ThemeGrid extends StatelessWidget {
-  const _ThemeGrid();
+class _BackSkinGrid extends StatelessWidget {
+  const _BackSkinGrid();
 
   @override
   Widget build(BuildContext context) {
@@ -281,27 +292,37 @@ class _ThemeGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       childAspectRatio: 1.05,
       children: const [
-        _ThemeTile(
-          title: 'Galaxy',
-          icon: Icons.nights_stay,
+        _BackSkinTile(
+          title: 'Default (Current)',
+          assetPath: 'assets/back_skins/default_skin.png',
           isEquipped: true,
         ),
-        _ThemeTile(title: 'Forest', icon: Icons.park),
-        _ThemeTile(title: 'Beach', icon: Icons.beach_access),
+        _BackSkinTile(
+          title: 'Galaxy',
+          assetPath: 'assets/back_skins/galaxy_skin.png',
+        ),
+        _BackSkinTile(
+          title: 'Nature',
+          assetPath: 'assets/back_skins/nature skin.png',
+        ),
+        _BackSkinTile(
+          title: 'Lava',
+          assetPath: 'assets/back_skins/lava_skin.png',
+        ),
       ],
     );
   }
 }
 
-class _ThemeTile extends StatelessWidget {
-  const _ThemeTile({
+class _BackSkinTile extends StatelessWidget {
+  const _BackSkinTile({
     required this.title,
-    required this.icon,
+    required this.assetPath,
     this.isEquipped = false,
   });
 
   final String title;
-  final IconData icon;
+  final String assetPath;
   final bool isEquipped;
 
   @override
@@ -331,8 +352,9 @@ class _ThemeTile extends StatelessWidget {
               color: const Color(0xFFF2EAFE),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: Center(
-              child: Icon(icon, color: const Color(0xFF6A5AE0), size: 30),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(assetPath, fit: BoxFit.cover),
             ),
           ),
           const SizedBox(height: 8),

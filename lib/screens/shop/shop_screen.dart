@@ -22,10 +22,6 @@ class ShopScreen extends StatelessWidget {
               _SectionTitle('Card Back Skins'),
               SizedBox(height: 12),
               _BackSkinGrid(),
-              SizedBox(height: 20),
-              _SectionTitle('Themes'),
-              SizedBox(height: 12),
-              _ThemeGrid(),
             ],
           ),
         ),
@@ -100,34 +96,19 @@ class _SkinGrid extends StatelessWidget {
       childAspectRatio: 0.85,
       children: const [
         _SkinCard(
-          title: 'Classic',
-          price: '\$2.99',
-          icon: Icons.crop_portrait,
+          title: 'Animal',
+          price: '\$3.99',
+          assetPath: 'assets/card_skins/animal_skin/a1.png',
         ),
         _SkinCard(
-          title: 'Ocean',
-          price: '\$2.99',
-          icon: Icons.water_drop,
+          title: 'Space',
+          price: '\$5.99',
+          assetPath: 'assets/card_skins/space_skin/s1.png',
         ),
         _SkinCard(
-          title: 'Fire',
-          price: '\$2.99',
-          icon: Icons.local_fire_department,
-        ),
-        _SkinCard(
-          title: 'Ice',
-          price: '\$2.99',
-          icon: Icons.ac_unit,
-        ),
-        _SkinCard(
-          title: 'Rainbow',
+          title: 'Sport',
           price: '\$4.99',
-          icon: Icons.color_lens,
-        ),
-        _SkinCard(
-          title: 'Neon',
-          price: '\$4.99',
-          icon: Icons.palette,
+          assetPath: 'assets/card_skins/sport_skin/Sp1.png',
         ),
       ],
     );
@@ -255,140 +236,6 @@ class _SkinCard extends StatelessWidget {
   }
 }
 
-class _ThemeGrid extends StatelessWidget {
-  const _ThemeGrid();
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      crossAxisSpacing: 14,
-      mainAxisSpacing: 14,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      childAspectRatio: 0.9,
-      children: const [
-        _ThemeCard(
-          title: 'Galaxy',
-          price: '500',
-          icon: Icons.nights_stay,
-          gradient: [Color(0xFF7B5CFF), Color(0xFF5C6CFF)],
-        ),
-        _ThemeCard(
-          title: 'Forest',
-          price: '450',
-          icon: Icons.park,
-          gradient: [Color(0xFF39D98A), Color(0xFF2BB673)],
-        ),
-        _ThemeCard(
-          title: 'Beach',
-          price: '500',
-          icon: Icons.beach_access,
-          gradient: [Color(0xFF54A8FF), Color(0xFF3C89E0)],
-        ),
-        _ThemeCard(
-          title: 'Neon City',
-          price: '550',
-          icon: Icons.bolt,
-          gradient: [Color(0xFFB45CFF), Color(0xFF8B4BE3)],
-        ),
-        _ThemeCard(
-          title: 'Winter',
-          price: '450',
-          icon: Icons.ac_unit,
-          gradient: [Color(0xFF5AC8FA), Color(0xFF4A78FF)],
-        ),
-        _ThemeCard(
-          title: 'Cherry Blossom',
-          price: '500',
-          icon: Icons.local_florist,
-          gradient: [Color(0xFFFF7EB3), Color(0xFFFF4D7E)],
-        ),
-      ],
-    );
-  }
-}
-
-class _ThemeCard extends StatelessWidget {
-  const _ThemeCard({
-    required this.title,
-    required this.price,
-    required this.icon,
-    required this.gradient,
-  });
-
-  final String title;
-  final String price;
-  final IconData icon;
-  final List<Color> gradient;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x12000000),
-            blurRadius: 18,
-            offset: Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 90,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(colors: gradient),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            child: Center(
-              child: Icon(icon, color: Colors.white, size: 30),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Color(0xFF2F2B3A),
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(Icons.diamond, size: 16, color: Color(0xFF49E3FF)),
-                    const SizedBox(width: 4),
-                    Text(
-                      price,
-                      style: const TextStyle(
-                        color: Color(0xFF2F2B3A),
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const Spacer(),
-                    const _BuyButton(
-                      label: 'Buy',
-                      color: Color(0xFFB15CFF),
-                      textColor: Colors.white,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _BuyButton extends StatelessWidget {
   const _BuyButton({

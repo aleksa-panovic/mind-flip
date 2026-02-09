@@ -77,7 +77,6 @@ class _HomeGuestScreenState extends State<HomeGuestScreen>
                         ),
                       ),
                       const Spacer(),
-                      const _ChampionCard(),
                     ],
                   ),
                 ),
