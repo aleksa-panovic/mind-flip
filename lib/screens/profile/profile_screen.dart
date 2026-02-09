@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
 import '../../widgets/gradient_header.dart';
+import '../../widgets/stat_row.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -58,20 +59,18 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: GradientHeader(
-        title: 'Profile',
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-        leading: _HeaderIcon(
-          icon: Icons.chevron_left,
-          onTap: () => Navigator.pop(context),
-        ),
-        trailing: _HeaderIcon(
-          icon: Icons.edit_outlined,
-          onTap: () {},
-        ),
-        bottom: const _AvatarBlock(),
+    return GradientHeader(
+      title: 'Profile',
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+      leading: _HeaderIcon(
+        icon: Icons.chevron_left,
+        onTap: () => Navigator.pop(context),
       ),
+      trailing: _HeaderIcon(
+        icon: Icons.edit_outlined,
+        onTap: () {},
+      ),
+      bottom: const _AvatarBlock(),
     );
   }
 }
@@ -346,57 +345,19 @@ class _StatsCard extends StatelessWidget {
       ),
       child: Column(
         children: const [
-          _StatRow(label: 'Total Play Time', value: '24h 35m'),
+          StatRow(label: 'Total Play Time', value: '24h 35m'),
           SizedBox(height: 10),
-          _StatRow(label: 'Average Score', value: '1,420'),
+          StatRow(label: 'Average Score', value: '1,420'),
           SizedBox(height: 10),
-          _StatRow(
+          StatRow(
             label: 'Longest Streak',
             value: '12 days',
             valueColor: Color(0xFF6A5AE0),
           ),
           SizedBox(height: 10),
-          _StatRow(label: 'Cards Flipped', value: '8,542'),
+          StatRow(label: 'Cards Flipped', value: '8,542'),
         ],
       ),
-    );
-  }
-}
-
-class _StatRow extends StatelessWidget {
-  const _StatRow({
-    required this.label,
-    required this.value,
-    this.valueColor = const Color(0xFF2F2B3A),
-  });
-
-  final String label;
-  final String value;
-  final Color valueColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: Color(0xFF8F8DA6),
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            color: valueColor,
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ],
     );
   }
 }
