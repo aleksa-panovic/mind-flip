@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/auth_provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -131,6 +134,10 @@ class _AvatarBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final name =
+        context.watch<AuthProvider>().currentUser?.username ?? 'Guest';
+    final email =
+        context.watch<AuthProvider>().currentUser?.email ?? 'guest@local';
     return Column(
       children: [
         Stack(
@@ -163,9 +170,9 @@ class _AvatarBlock extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 10),
-        const Text(
-          'Alex_Pro',
-          style: TextStyle(
+        Text(
+          name,
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -173,7 +180,7 @@ class _AvatarBlock extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          'Member since Jan 2024',
+          email,
           style: TextStyle(
             color: Colors.white.withOpacity(0.7),
             fontSize: 12,
