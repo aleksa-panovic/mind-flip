@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/action_tile.dart';
 import '../../widgets/stat_card.dart';
+import '../../widgets/icon_chip.dart';
 
 class HomeUserScreen extends StatelessWidget {
   const HomeUserScreen({super.key});
@@ -142,16 +143,16 @@ class _HeaderSection extends StatelessWidget {
                   },
                 ),
               ),
-              _IconChip(
+              IconChip(
                 icon: Icons.person_outline,
                 onTap: () {
                   Navigator.pushNamed(context, '/profile');
                 },
               ),
               const SizedBox(width: 10),
-              _IconChip(icon: Icons.notifications_none),
+              const IconChip(icon: Icons.notifications_none),
               const SizedBox(width: 10),
-              _IconChip(icon: Icons.settings_outlined),
+              const IconChip(icon: Icons.settings_outlined),
             ],
           ),
           const SizedBox(height: 18),
@@ -188,29 +189,6 @@ class _HeaderSection extends StatelessWidget {
   }
 }
 
-class _IconChip extends StatelessWidget {
-  const _IconChip({required this.icon, this.onTap});
-
-  final IconData icon;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(icon, color: Colors.white),
-      ),
-    );
-  }
-}
 
 
 class _PlayNowButton extends StatelessWidget {
