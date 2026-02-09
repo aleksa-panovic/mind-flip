@@ -90,15 +90,22 @@ class _HeaderSection extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF37E8B6),
-                  borderRadius: BorderRadius.circular(14),
+              GestureDetector(
+                onDoubleTap: () {
+                  Navigator.pushNamed(context, '/admin');
+                },
+                child: Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF37E8B6),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(
+                    Icons.sentiment_satisfied_alt,
+                    color: Colors.white,
+                  ),
                 ),
-                child:
-                    const Icon(Icons.sentiment_satisfied_alt, color: Colors.white),
               ),
               const SizedBox(width: 12),
               const Expanded(
