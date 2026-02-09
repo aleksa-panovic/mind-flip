@@ -7,6 +7,6 @@ class Game5x6Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const GameScreen(gridSize: 5);
+    return const GameScreen(rows: 6, cols: 5);
   }
 }

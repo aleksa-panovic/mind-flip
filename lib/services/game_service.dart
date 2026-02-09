@@ -5,10 +5,10 @@ class GameService {
     required int timeSeconds,
     required int moves,
     required int bestCombo,
-    required int gridSize,
+    required int gridCells,
   }) {
     // Basic scoring formula for KT2. Replace with backend rules in KT3.
-    final base = (gridSize * gridSize) * 50;
+    final base = gridCells * 50;
     final timePenalty = timeSeconds * 2;
     final movePenalty = moves * 3;
     final comboBonus = bestCombo * 25;

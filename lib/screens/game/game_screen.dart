@@ -4,9 +4,14 @@ import 'package:provider/provider.dart';
 import '../../providers/game_provider.dart';
 
 class GameScreen extends StatefulWidget {
-  const GameScreen({super.key, required this.gridSize});
+  const GameScreen({
+    super.key,
+    required this.rows,
+    required this.cols,
+  });
 
-  final int gridSize;
+  final int rows;
+  final int cols;
 
   @override
   State<GameScreen> createState() => _GameScreenState();
@@ -19,7 +24,9 @@ class _GameScreenState extends State<GameScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<GameProvider>().startGame(widget.gridSize);
+      context
+          .read<GameProvider>()
+          .startGame(rows: widget.rows, cols: widget.cols);
     });
   }
 
@@ -58,7 +65,7 @@ class _GameScreenState extends State<GameScreen> {
                   children: [
                     _TopBar(
                       matched: provider.matches,
-                      totalPairs: (provider.gridSize * provider.gridSize) ~/ 2,
+                      totalPairs: (provider.rows * provider.cols) ~/ 2,
                       timeLabel: provider.formattedTime,
                     ),
                     const SizedBox(height: 14),
@@ -67,7 +74,8 @@ class _GameScreenState extends State<GameScreen> {
                     Expanded(
                       child: Center(
                         child: _GameGrid(
-                          size: provider.gridSize,
+                          rows: provider.rows,
+                          cols: provider.cols,
                           onTap: provider.flipCard,
                           isLocked: provider.isBusy,
                         ),
@@ -240,12 +248,14 @@ class _ScoreBar extends StatelessWidget {
 
 class _GameGrid extends StatelessWidget {
   const _GameGrid({
-    required this.size,
+    required this.rows,
+    required this.cols,
     required this.onTap,
     required this.isLocked,
   });
 
-  final int size;
+  final int rows;
+  final int cols;
   final bool isLocked;
   final void Function(int index) onTap;
 
@@ -260,9 +270,9 @@ class _GameGrid extends StatelessWidget {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: size,
-          mainAxisSpacing: size >= 6 ? 8 : 10,
-          crossAxisSpacing: size >= 6 ? 8 : 10,
+          crossAxisCount: cols,
+          mainAxisSpacing: rows >= 6 || cols >= 6 ? 8 : 10,
+          crossAxisSpacing: rows >= 6 || cols >= 6 ? 8 : 10,
         ),
         itemBuilder: (context, index) {
           final card = cards[index];

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
+import '../../widgets/action_tile.dart';
 
 class HomeUserScreen extends StatelessWidget {
   const HomeUserScreen({super.key});
@@ -31,7 +32,7 @@ class HomeUserScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    _ActionTile(
+                    ActionTile(
                       icon: Icons.leaderboard,
                       title: 'Ranks',
                       subtitle: 'Global leaderboard',
@@ -40,7 +41,7 @@ class HomeUserScreen extends StatelessWidget {
                       },
                     ),
                     const SizedBox(height: 12),
-                    _ActionTile(
+                    ActionTile(
                       icon: Icons.shopping_bag,
                       title: 'Shop',
                       subtitle: 'Boosts & cosmetics',
@@ -49,7 +50,7 @@ class HomeUserScreen extends StatelessWidget {
                       },
                     ),
                     const SizedBox(height: 12),
-                    _ActionTile(
+                    ActionTile(
                       icon: Icons.inventory_2_outlined,
                       title: 'Inventory',
                       subtitle: 'Your collection',
@@ -432,80 +433,6 @@ class _DifficultyButton extends StatelessWidget {
   }
 }
 
-class _ActionTile extends StatelessWidget {
-  const _ActionTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x11000000),
-              blurRadius: 14,
-              offset: Offset(0, 8),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFFEFF0FF),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(icon, color: const Color(0xFF6A5AE0)),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: Color(0xFF2F2B3A),
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      color: Color(0xFF8F8DA6),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(Icons.chevron_right, color: Color(0xFFB8B6C9)),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _DailyGiftCard extends StatelessWidget {
   const _DailyGiftCard();

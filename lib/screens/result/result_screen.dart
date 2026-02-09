@@ -5,6 +5,7 @@ import '../../models/game_result.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/game_provider.dart';
+import '../../widgets/primary_gradient_button.dart';
 
 class ResultScreen extends StatelessWidget {
   const ResultScreen({super.key, this.result});
@@ -159,13 +160,14 @@ class _ResultContent extends StatelessWidget {
           ],
         ),
         const Spacer(),
-        _PrimaryButton(
+        PrimaryGradientButton(
           label: 'Play Again',
           onPressed: () {
-            final size = context.read<GameProvider>().lastGridSize;
-            final route = size == 6
+            final rows = context.read<GameProvider>().lastRows;
+            final cols = context.read<GameProvider>().lastCols;
+            final route = (rows == 6 && cols == 6)
                 ? '/game-6x6'
-                : size == 5
+                : (rows == 6 && cols == 5)
                     ? '/game-5x6'
                     : '/game-4x4';
             Navigator.pushReplacementNamed(context, route);
@@ -329,54 +331,6 @@ class _StatItem extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _PrimaryButton extends StatelessWidget {
-  const _PrimaryButton({required this.label, required this.onPressed});
-
-  final String label;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 52,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF22D6E0), Color(0xFF4CE27A)],
-          ),
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x5522D6E0),
-              blurRadius: 16,
-              offset: Offset(0, 8),
-            ),
-          ],
-        ),
-        child: ElevatedButton(
-          onPressed: onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.transparent,
-            shadowColor: Colors.transparent,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
-          ),
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w800,
-              fontSize: 16,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

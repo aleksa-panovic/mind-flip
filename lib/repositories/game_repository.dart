@@ -10,13 +10,13 @@ class GameRepository {
     required int timeSeconds,
     required int moves,
     required int bestCombo,
-    required int gridSize,
+    required int gridCells,
   }) {
     return _service.buildResult(
       timeSeconds: timeSeconds,
       moves: moves,
       bestCombo: bestCombo,
-      gridSize: gridSize,
+      gridCells: gridCells,
     );
   }
 

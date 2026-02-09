@@ -38,8 +38,10 @@ class GameProvider extends ChangeNotifier {
   ];
 
   List<GameCardModel> cards = [];
-  int gridSize = 4;
-  int lastGridSize = 4;
+  int rows = 4;
+  int cols = 4;
+  int lastRows = 4;
+  int lastCols = 4;
   int moves = 0;
   int matches = 0;
   int timeSeconds = 0;
@@ -52,9 +54,11 @@ class GameProvider extends ChangeNotifier {
   int? _firstIndex;
   Timer? _timer;
 
-  void startGame(int size) {
-    gridSize = size;
-    lastGridSize = size;
+  void startGame({required int rows, required int cols}) {
+    this.rows = rows;
+    this.cols = cols;
+    lastRows = rows;
+    lastCols = cols;
     moves = 0;
     matches = 0;
     timeSeconds = 0;
@@ -70,7 +74,7 @@ class GameProvider extends ChangeNotifier {
   }
 
   void _buildDeck() {
-    final totalCards = gridSize * gridSize;
+    final totalCards = rows * cols;
     final pairs = totalCards ~/ 2;
     final rand = Random();
     final icons = List<IconData>.from(_icons);
@@ -109,7 +113,7 @@ class GameProvider extends ChangeNotifier {
           timeSeconds: timeSeconds,
           moves: moves,
           bestCombo: bestCombo,
-          gridSize: gridSize,
+          gridCells: rows * cols,
         )
         .score;
   }
@@ -142,7 +146,7 @@ class GameProvider extends ChangeNotifier {
       _firstIndex = null;
       isBusy = false;
       notifyListeners();
-      if (matches == (gridSize * gridSize) ~/ 2) {
+      if (matches == (rows * cols) ~/ 2) {
         _finishGame();
       }
       return;
@@ -164,7 +168,7 @@ class GameProvider extends ChangeNotifier {
       timeSeconds: timeSeconds,
       moves: moves,
       bestCombo: bestCombo,
-      gridSize: gridSize,
+      gridCells: rows * cols,
     );
     notifyListeners();
     if (result != null) {
