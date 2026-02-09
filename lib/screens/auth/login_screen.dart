@@ -1,10 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class LoginScreen extends StatelessWidget {
+import '../../providers/auth_provider.dart';
+
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final _emailCtrl = TextEditingController();
+  final _passCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailCtrl.dispose();
+    _passCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    FocusScope.of(context).unfocus();
+    final email = _emailCtrl.text.trim();
+    final pass = _passCtrl.text;
+    if (email.isEmpty || !email.contains('@') || pass.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unesi validne podatke.')),
+      );
+      return;
+    }
+    final ok = await context.read<AuthProvider>().login(
+          email: email,
+          password: pass,
+        );
+    if (!mounted) return;
+    if (ok) {
+      Navigator.pushReplacementNamed(context, '/home-user');
+    } else {
+      final msg = context.read<AuthProvider>().errorMessage ?? 'Login error';
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -84,7 +126,11 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    _InputField(hintText: 'your@email.com', obscureText: false),
+                    _InputField(
+                      hintText: 'your@email.com',
+                      obscureText: false,
+                      controller: _emailCtrl,
+                    ),
                     const SizedBox(height: 14),
                     const Text(
                       'Password',
@@ -95,7 +141,11 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    _InputField(hintText: '••••••••', obscureText: true),
+                    _InputField(
+                      hintText: '••••••••',
+                      obscureText: true,
+                      controller: _passCtrl,
+                    ),
                     const SizedBox(height: 10),
                     Align(
                       alignment: Alignment.centerRight,
@@ -119,12 +169,7 @@ class LoginScreen extends StatelessWidget {
                       width: double.infinity,
                       height: 54,
                       child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(
-                            context,
-                            '/home-user',
-                          );
-                        },
+                        onPressed: auth.isLoading ? null : _submit,
                         style: ElevatedButton.styleFrom(
                           elevation: 0,
                           backgroundColor: const Color(0xFF6A5AE0),
@@ -132,14 +177,23 @@ class LoginScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                        child: const Text(
-                          'Sign In',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                          ),
-                        ),
+                        child: auth.isLoading
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text(
+                                'Sign In',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
                     ),
                     const SizedBox(height: 18),
@@ -233,8 +287,13 @@ class LoginScreen extends StatelessWidget {
 class _InputField extends StatelessWidget {
   final String hintText;
   final bool obscureText;
+  final TextEditingController controller;
 
-  const _InputField({required this.hintText, required this.obscureText});
+  const _InputField({
+    required this.hintText,
+    required this.obscureText,
+    required this.controller,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -246,6 +305,7 @@ class _InputField extends StatelessWidget {
         border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
       child: TextField(
+        controller: controller,
         obscureText: obscureText,
         decoration: InputDecoration(
           hintText: hintText,

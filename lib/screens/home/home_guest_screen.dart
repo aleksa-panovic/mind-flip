@@ -61,7 +61,11 @@ class _HomeGuestScreenState extends State<HomeGuestScreen>
                       const SizedBox(height: 18),
                       const _TitleBlock(),
                       const SizedBox(height: 24),
-                      _PlayButton(onPressed: () {}),
+                      _PlayButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/game-4x4');
+                        },
+                      ),
                       const SizedBox(height: 10),
                       const Text(
                         'Sign in to save progress & compete!',

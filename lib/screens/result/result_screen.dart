@@ -1,18 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../models/game_result.dart';
+import '../../models/user_model.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/game_provider.dart';
 
 class ResultScreen extends StatelessWidget {
-  const ResultScreen({super.key});
+  const ResultScreen({super.key, this.result});
+
+  final GameResult? result;
 
   @override
   Widget build(BuildContext context) {
+    final routeResult =
+        ModalRoute.of(context)?.settings.arguments as GameResult?;
+    final data = result ?? routeResult;
+    final score = data?.score ?? 1850;
+    final timeSeconds = data?.timeSeconds ?? 154;
+    final moves = data?.moves ?? 24;
+    final combo = data?.bestCombo ?? 5;
+    final coins = data?.coinsEarned ?? 250;
+    final timeLabel =
+        '${(timeSeconds ~/ 60)}:${(timeSeconds % 60).toString().padLeft(2, '0')}';
     return Scaffold(
       body: Stack(
-        children: const [
-          _ResultBackground(),
+        children: [
+          const _ResultBackground(),
           SafeArea(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(22, 18, 22, 18),
-              child: _ResultContent(),
+              padding: const EdgeInsets.fromLTRB(22, 18, 22, 18),
+              child: _ResultContent(
+                score: score,
+                timeLabel: timeLabel,
+                moves: moves,
+                combo: combo,
+                coins: coins,
+              ),
             ),
           ),
         ],
@@ -66,7 +90,19 @@ class _Sparkle extends StatelessWidget {
 }
 
 class _ResultContent extends StatelessWidget {
-  const _ResultContent();
+  const _ResultContent({
+    required this.score,
+    required this.timeLabel,
+    required this.moves,
+    required this.combo,
+    required this.coins,
+  });
+
+  final int score;
+  final String timeLabel;
+  final int moves;
+  final int combo;
+  final int coins;
 
   @override
   Widget build(BuildContext context) {
@@ -100,16 +136,21 @@ class _ResultContent extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 22),
-        const _ScoreCard(),
+        _ScoreCard(
+          score: score,
+          timeLabel: timeLabel,
+          moves: moves,
+          combo: combo,
+        ),
         const SizedBox(height: 22),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Icon(Icons.diamond, color: Color(0xFF49E3FF)),
-            SizedBox(width: 8),
+          children: [
+            const Icon(Icons.diamond, color: Color(0xFF49E3FF)),
+            const SizedBox(width: 8),
             Text(
-              '+250 Coins Earned!',
-              style: TextStyle(
+              '+$coins Coins Earned!',
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
                 fontSize: 14,
@@ -118,10 +159,27 @@ class _ResultContent extends StatelessWidget {
           ],
         ),
         const Spacer(),
-        const _PrimaryButton(label: 'Play Again'),
+        _PrimaryButton(
+          label: 'Play Again',
+          onPressed: () {
+            final size = context.read<GameProvider>().lastGridSize;
+            final route = size == 6
+                ? '/game-6x6'
+                : size == 5
+                    ? '/game-5x6'
+                    : '/game-4x4';
+            Navigator.pushReplacementNamed(context, route);
+          },
+        ),
         const SizedBox(height: 12),
         TextButton(
-          onPressed: () {},
+          onPressed: () {
+            final user = context.read<AuthProvider>().currentUser;
+            final route = user == null || user.role == UserRole.guest
+                ? '/home-guest'
+                : '/home-user';
+            Navigator.pushReplacementNamed(context, route);
+          },
           style: TextButton.styleFrom(
             foregroundColor: const Color(0xFFD9D7FF),
           ),
@@ -157,7 +215,17 @@ class _IconBadge extends StatelessWidget {
 }
 
 class _ScoreCard extends StatelessWidget {
-  const _ScoreCard();
+  const _ScoreCard({
+    required this.score,
+    required this.timeLabel,
+    required this.moves,
+    required this.combo,
+  });
+
+  final int score;
+  final String timeLabel;
+  final int moves;
+  final int combo;
 
   @override
   Widget build(BuildContext context) {
@@ -190,9 +258,9 @@ class _ScoreCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            '1,850',
-            style: TextStyle(
+          Text(
+            score.toString(),
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 34,
               fontWeight: FontWeight.w800,
@@ -203,10 +271,14 @@ class _ScoreCard extends StatelessWidget {
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              _StatItem(label: 'Time', value: '2:34'),
-              _StatItem(label: 'Moves', value: '24'),
-              _StatItem(label: 'Combo', value: 'x5', valueColor: Color(0xFF6FF3FF)),
+            children: [
+              _StatItem(label: 'Time', value: timeLabel),
+              _StatItem(label: 'Moves', value: moves.toString()),
+              _StatItem(
+                label: 'Combo',
+                value: 'x$combo',
+                valueColor: const Color(0xFF6FF3FF),
+              ),
             ],
           ),
         ],
@@ -262,9 +334,10 @@ class _StatItem extends StatelessWidget {
 }
 
 class _PrimaryButton extends StatelessWidget {
-  const _PrimaryButton({required this.label});
+  const _PrimaryButton({required this.label, required this.onPressed});
 
   final String label;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -286,7 +359,7 @@ class _PrimaryButton extends StatelessWidget {
           ],
         ),
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: onPressed,
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.transparent,
             shadowColor: Colors.transparent,

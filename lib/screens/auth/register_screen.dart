@@ -1,5 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/auth_provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -37,7 +40,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!_agree) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Moraš prihvatiti uslove i politiku privatnosti.'),
+          content: Text('Moras prihvatiti uslove i politiku privatnosti.'),
         ),
       );
       return;
@@ -45,11 +48,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (_formKey.currentState?.validate() != true) return;
 
-    // TODO: Pozovi tvoj auth/register servis.
-    // npr: context.read<AuthCubit>().register(...)
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Register OK (placeholder).')));
+    _doRegister();
+  }
+
+  Future<void> _doRegister() async {
+    final ok = await context.read<AuthProvider>().register(
+          username: _usernameCtrl.text.trim(),
+          email: _emailCtrl.text.trim(),
+          password: _passCtrl.text,
+        );
+    if (!mounted) return;
+    if (ok) {
+      Navigator.pushReplacementNamed(context, '/home-user');
+    } else {
+      final msg = context.read<AuthProvider>().errorMessage ?? 'Register error';
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    }
   }
 
   InputDecoration _dec(String label, String hint, {Widget? suffixIcon}) {
@@ -69,6 +83,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
     final bg = const Color(0xFFF5F6FA);
     final purple1 = const Color(0xFF7B5CFF);
     final purple2 = const Color(0xFF6A5BD7);
@@ -79,7 +94,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Header (gradient + rounded bottom)
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 26),
@@ -97,7 +111,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // back
                   InkWell(
                     onTap: () => Navigator.pop(context),
                     borderRadius: BorderRadius.circular(999),
@@ -125,8 +138,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ],
               ),
             ),
-
-            // Content
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
@@ -145,8 +156,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                       const SizedBox(height: 18),
-
-                      // Username
                       const Text(
                         'Username',
                         style: TextStyle(
@@ -170,8 +179,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-
-                      // Email
                       const Text(
                         'Email',
                         style: TextStyle(
@@ -189,16 +196,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           if (v == null || v.trim().isEmpty) {
                             return 'Email je obavezan.';
                           }
-                          final ok = RegExp(
-                            r'^[^@]+@[^@]+\.[^@]+',
-                          ).hasMatch(v.trim());
+                          final ok = RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                              .hasMatch(v.trim());
                           if (!ok) return 'Unesi validan email.';
                           return null;
                         },
                       ),
                       const SizedBox(height: 16),
-
-                      // Password
                       const Text(
                         'Password',
                         style: TextStyle(
@@ -233,8 +237,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-
-                      // Confirm
                       const Text(
                         'Confirm Password',
                         style: TextStyle(
@@ -252,9 +254,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           'Confirm Password',
                           '••••••••',
                           suffixIcon: IconButton(
-                            onPressed: () => setState(
-                              () => _obscureConfirm = !_obscureConfirm,
-                            ),
+                            onPressed: () =>
+                                setState(() => _obscureConfirm = !_obscureConfirm),
                             icon: Icon(
                               _obscureConfirm
                                   ? Icons.visibility_off
@@ -272,10 +273,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           return null;
                         },
                       ),
-
                       const SizedBox(height: 14),
-
-                      // Checkbox + links
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -310,9 +308,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         fontWeight: FontWeight.w700,
                                       ),
                                       recognizer: TapGestureRecognizer()
-                                        ..onTap = () {
-                                          // TODO: otvori TOS
-                                        },
+                                        ..onTap = () {},
                                     ),
                                     TextSpan(
                                       text: ' and ',
@@ -327,9 +323,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         fontWeight: FontWeight.w700,
                                       ),
                                       recognizer: TapGestureRecognizer()
-                                        ..onTap = () {
-                                          // TODO: otvori Privacy
-                                        },
+                                        ..onTap = () {},
                                     ),
                                   ],
                                 ),
@@ -338,15 +332,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 14),
-
-                      // CTA button
                       SizedBox(
                         width: double.infinity,
                         height: 54,
                         child: ElevatedButton(
-                          onPressed: _submit,
+                          onPressed: auth.isLoading ? null : _submit,
                           style: ElevatedButton.styleFrom(
                             elevation: 0,
                             backgroundColor: purple2,
@@ -354,19 +345,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                           ),
-                          child: const Text(
-                            'Create Account',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
+                          child: auth.isLoading
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text(
+                                  'Create Account',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
                         ),
                       ),
-
                       const SizedBox(height: 18),
-
-                      // Footer sign in
                       Center(
                         child: Text.rich(
                           TextSpan(
@@ -385,9 +382,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
-                                    Navigator.pop(
-                                      context,
-                                    ); // ili Navigator.pushNamed(...)
+                                    Navigator.pop(context);
                                   },
                               ),
                             ],
