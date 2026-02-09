@@ -47,10 +47,12 @@ class HomeUserScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     _ActionTile(
-                      icon: Icons.person,
-                      title: 'Profile',
-                      subtitle: 'Edit your account',
-                      onTap: () {},
+                      icon: Icons.inventory_2_outlined,
+                      title: 'Inventory',
+                      subtitle: 'Your collection',
+                      onTap: () {
+                        Navigator.pushNamed(context, '/inventory');
+                      },
                     ),
                     const SizedBox(height: 20),
                     const _DailyGiftCard(),
@@ -493,62 +495,255 @@ class _ActionTile extends StatelessWidget {
 class _DailyGiftCard extends StatelessWidget {
   const _DailyGiftCard();
 
+  void _showDailyBonus(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => const _DailyBonusDialog(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF7B5CFF), Color(0xFFDA4FFF)],
+    return InkWell(
+      onTap: () => _showDailyBonus(context),
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF7B5CFF), Color(0xFFDA4FFF)],
+          ),
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x227B5CFF),
+              blurRadius: 16,
+              offset: Offset(0, 10),
+            ),
+          ],
         ),
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x227B5CFF),
-            blurRadius: 16,
-            offset: Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(16),
+        child: Row(
+          children: [
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Icon(Icons.card_giftcard, color: Colors.white),
             ),
-            child: const Icon(Icons.card_giftcard, color: Colors.white),
-          ),
-          const SizedBox(width: 14),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Daily Gift',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
+            const SizedBox(width: 14),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Daily Gift',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                    ),
                   ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Tap to claim your reward',
-                  style: TextStyle(
-                    color: Color(0xFFEADFFF),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
+                  SizedBox(height: 4),
+                  Text(
+                    'Tap to claim your reward',
+                    style: TextStyle(
+                      color: Color(0xFFEADFFF),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const Icon(Icons.chevron_right, color: Colors.white),
-        ],
+            const Icon(Icons.chevron_right, color: Colors.white),
+          ],
+        ),
       ),
     );
   }
+}
+
+class _DailyBonusDialog extends StatelessWidget {
+  const _DailyBonusDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x33000000),
+              blurRadius: 20,
+              offset: Offset(0, 12),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Align(
+              alignment: Alignment.topRight,
+              child: InkWell(
+                onTap: () => Navigator.pop(context),
+                borderRadius: BorderRadius.circular(999),
+                child: Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF0F1F7),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: const Icon(Icons.close, size: 16),
+                ),
+              ),
+            ),
+            const Icon(Icons.card_giftcard, size: 46, color: Color(0xFF6A5AE0)),
+            const SizedBox(height: 10),
+            const Text(
+              'Daily Bonus!',
+              style: TextStyle(
+                color: Color(0xFF2F2B3A),
+                fontWeight: FontWeight.w800,
+                fontSize: 18,
+              ),
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'Claim your reward today',
+              style: TextStyle(
+                color: Color(0xFF8F8DA6),
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF2EAFE),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.diamond, color: Color(0xFF49E3FF)),
+                      SizedBox(width: 8),
+                      Text(
+                        '+250',
+                        style: TextStyle(
+                          color: Color(0xFF6A5AE0),
+                          fontWeight: FontWeight.w800,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Coins',
+                    style: TextStyle(
+                      color: Color(0xFF8F8DA6),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: List.generate(7, (index) {
+                      final isActive = index < 2;
+                      return Container(
+                        width: 26,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: isActive
+                              ? const Color(0xFF37D07A)
+                              : const Color(0xFFDDDFE9),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 6),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Day 1', style: _DayLabel()),
+                      Text('Day 2', style: _DayLabel()),
+                      Text('Day 3', style: _DayLabel()),
+                      Text('Day 4', style: _DayLabel()),
+                      Text('Day 5', style: _DayLabel()),
+                      Text('Day 6', style: _DayLabel()),
+                      Text('Day 7', style: _DayLabel()),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF22D6E0), Color(0xFF4CE27A)],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: const Text(
+                    'Claim Reward',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Next bonus in 24 hours',
+              style: TextStyle(
+                color: Color(0xFFB4B2C5),
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DayLabel extends TextStyle {
+  const _DayLabel()
+      : super(
+          color: const Color(0xFF8F8DA6),
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+        );
 }

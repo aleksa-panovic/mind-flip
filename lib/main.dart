@@ -12,6 +12,7 @@ import 'screens/result/result_screen.dart';
 import 'screens/leaderboard/leaderboard_screen.dart';
 import 'screens/profile/profile_screen.dart';
 import 'screens/shop/shop_screen.dart';
+import 'screens/inventory/inventory_screen.dart';
 
 void main() {
   runApp(const MindFlipApp());
@@ -50,6 +51,7 @@ class MindFlipApp extends StatelessWidget {
         '/leaderboard': (context) => const LeaderboardScreen(),
         '/profile': (context) => const ProfileScreen(),
         '/shop': (context) => const ShopScreen(),
+        '/inventory': (context) => const InventoryScreen(),
       },
     );
   }
