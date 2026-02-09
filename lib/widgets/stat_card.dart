@@ -37,11 +37,11 @@ class StatCard extends StatelessWidget {
           Row(
             children: [
               assetPath == null
-                  ? Icon(icon, size: 16, color: Colors.white)
+                  ? Icon(icon, size: 20, color: Colors.white)
                   : Image.asset(
                       assetPath!,
-                      width: 16,
-                      height: 16,
+                      width: 22,
+                      height: 22,
                       fit: BoxFit.contain,
                     ),
               const SizedBox(width: 6),

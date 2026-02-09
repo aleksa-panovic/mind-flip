@@ -281,7 +281,7 @@ class _GameGrid extends StatelessWidget {
             child: _GridTile(
               isRevealed: card.isFaceUp || card.isMatched,
               isMatched: card.isMatched,
-              icon: card.icon,
+              assetPath: card.assetPath,
             ),
           );
         },
@@ -294,12 +294,12 @@ class _GridTile extends StatelessWidget {
   const _GridTile({
     required this.isRevealed,
     required this.isMatched,
-    required this.icon,
+    required this.assetPath,
   });
 
   final bool isRevealed;
   final bool isMatched;
-  final IconData icon;
+  final String assetPath;
 
   @override
   Widget build(BuildContext context) {
@@ -320,8 +320,19 @@ class _GridTile extends StatelessWidget {
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 200),
           child: isRevealed
-              ? Icon(icon, color: const Color(0xFF6A5AE0), size: 26)
-              : const SizedBox.shrink(),
+              ? Image.asset(
+                  assetPath,
+                  width: 44,
+                  height: 44,
+                  fit: BoxFit.contain,
+                )
+              : ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: Image.asset(
+                    'assets/back_skins/default_skin.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
         ),
       ),
     );

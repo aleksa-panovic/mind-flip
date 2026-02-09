@@ -215,8 +215,8 @@ class _PodiumCard extends StatelessWidget {
                 ? Icon(Icons.emoji_events, color: medalColor, size: 28)
                 : Image.asset(
                     trophyAsset!,
-                    width: isWinner ? 34 : 28,
-                    height: isWinner ? 34 : 28,
+                    width: isWinner ? 44 : 36,
+                    height: isWinner ? 44 : 36,
                   ),
           ),
         ),

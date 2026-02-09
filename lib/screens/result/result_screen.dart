@@ -111,10 +111,10 @@ class _ResultContent extends StatelessWidget {
       children: [
         const SizedBox(height: 24),
         _IconBadge(
-          child: const Icon(
-            Icons.celebration,
-            color: Colors.white,
-            size: 30,
+          child: Image.asset(
+            'assets/icons/winner_of_game.png',
+            width: 30,
+            height: 30,
           ),
         ),
         const SizedBox(height: 16),
@@ -149,12 +149,12 @@ class _ResultContent extends StatelessWidget {
           children: [
             Image.asset(
               'assets/icons/diamond.png',
-              width: 18,
-              height: 18,
+              width: 24,
+              height: 24,
             ),
             const SizedBox(width: 8),
             Text(
-              '+$coins Coins Earned!',
+              '+$coins Diamonds Earned!',
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,

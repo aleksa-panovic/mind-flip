@@ -19,6 +19,10 @@ class ShopScreen extends StatelessWidget {
               SizedBox(height: 12),
               _SkinGrid(),
               SizedBox(height: 20),
+              _SectionTitle('Card Back Skins'),
+              SizedBox(height: 12),
+              _BackSkinGrid(),
+              SizedBox(height: 20),
               _SectionTitle('Themes'),
               SizedBox(height: 12),
               _ThemeGrid(),
@@ -130,16 +134,56 @@ class _SkinGrid extends StatelessWidget {
   }
 }
 
+class _BackSkinGrid extends StatelessWidget {
+  const _BackSkinGrid();
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.count(
+      crossAxisCount: 2,
+      crossAxisSpacing: 14,
+      mainAxisSpacing: 14,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      childAspectRatio: 0.85,
+      children: const [
+        _SkinCard(
+          title: 'Galaxy',
+          price: '1000',
+          assetPath: 'assets/back_skins/galaxy_skin.png',
+          isDiamond: true,
+        ),
+        _SkinCard(
+          title: 'Nature',
+          price: '2000',
+          assetPath: 'assets/back_skins/nature skin.png',
+          isDiamond: true,
+        ),
+        _SkinCard(
+          title: 'Lava',
+          price: '5000',
+          assetPath: 'assets/back_skins/lava_skin.png',
+          isDiamond: true,
+        ),
+      ],
+    );
+  }
+}
+
 class _SkinCard extends StatelessWidget {
   const _SkinCard({
     required this.title,
     required this.price,
-    required this.icon,
+    this.icon,
+    this.assetPath,
+    this.isDiamond = false,
   });
 
   final String title;
   final String price;
-  final IconData icon;
+  final IconData? icon;
+  final String? assetPath;
+  final bool isDiamond;
 
   @override
   Widget build(BuildContext context) {
@@ -166,7 +210,9 @@ class _SkinCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             child: Center(
-              child: Icon(icon, color: const Color(0xFF6A5AE0), size: 34),
+              child: assetPath != null
+                  ? Image.asset(assetPath!, width: 52, height: 52)
+                  : Icon(icon, color: const Color(0xFF6A5AE0), size: 34),
             ),
           ),
           const SizedBox(height: 10),
@@ -180,7 +226,14 @@ class _SkinCard extends StatelessWidget {
           const Spacer(),
           Row(
             children: [
-              const Icon(Icons.attach_money, size: 16, color: Color(0xFF3BD27A)),
+              isDiamond
+                  ? Image.asset(
+                      'assets/icons/diamond.png',
+                      width: 16,
+                      height: 16,
+                    )
+                  : const Icon(Icons.attach_money,
+                      size: 16, color: Color(0xFF3BD27A)),
               Text(
                 price,
                 style: const TextStyle(

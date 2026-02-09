@@ -12,29 +12,25 @@ class GameProvider extends ChangeNotifier {
 
   final GameRepository _repo;
 
-  final List<IconData> _icons = const [
-    Icons.star,
-    Icons.favorite,
-    Icons.bolt,
-    Icons.catching_pokemon,
-    Icons.ac_unit,
-    Icons.local_fire_department,
-    Icons.emoji_events,
-    Icons.pets,
-    Icons.sports_esports,
-    Icons.lightbulb,
-    Icons.flight_takeoff,
-    Icons.music_note,
-    Icons.palette,
-    Icons.color_lens,
-    Icons.security,
-    Icons.flash_on,
-    Icons.water_drop,
-    Icons.landscape,
-    Icons.auto_awesome,
-    Icons.emoji_objects,
-    Icons.trending_up,
-    Icons.explore,
+  final List<String> _icons = const [
+    'assets/card_skins/emoji_skin/e1.png',
+    'assets/card_skins/emoji_skin/e2.png',
+    'assets/card_skins/emoji_skin/e3.png',
+    'assets/card_skins/emoji_skin/e4.png',
+    'assets/card_skins/emoji_skin/e5.png',
+    'assets/card_skins/emoji_skin/e6.png',
+    'assets/card_skins/emoji_skin/e7.png',
+    'assets/card_skins/emoji_skin/e8.png',
+    'assets/card_skins/emoji_skin/e9.png',
+    'assets/card_skins/emoji_skin/e10.png',
+    'assets/card_skins/emoji_skin/e11.png',
+    'assets/card_skins/emoji_skin/e12.png',
+    'assets/card_skins/emoji_skin/e13.png',
+    'assets/card_skins/emoji_skin/e14.png',
+    'assets/card_skins/emoji_skin/e15.png',
+    'assets/card_skins/emoji_skin/e16.png',
+    'assets/card_skins/emoji_skin/e17.png',
+    'assets/card_skins/emoji_skin/e18.png',
   ];
 
   List<GameCardModel> cards = [];
@@ -77,15 +73,15 @@ class GameProvider extends ChangeNotifier {
     final totalCards = rows * cols;
     final pairs = totalCards ~/ 2;
     final rand = Random();
-    final icons = List<IconData>.from(_icons);
+    final icons = List<String>.from(_icons);
     icons.shuffle(rand);
     final selected = icons.take(pairs).toList();
 
     final List<GameCardModel> deck = [];
     int id = 0;
     for (var i = 0; i < pairs; i++) {
-      deck.add(GameCardModel(id: id++, pairId: i, icon: selected[i]));
-      deck.add(GameCardModel(id: id++, pairId: i, icon: selected[i]));
+      deck.add(GameCardModel(id: id++, pairId: i, assetPath: selected[i]));
+      deck.add(GameCardModel(id: id++, pairId: i, assetPath: selected[i]));
     }
     deck.shuffle(rand);
     cards = deck;

@@ -48,8 +48,8 @@ class ActionTile extends StatelessWidget {
                     ? Icon(icon, color: const Color(0xFF6A5AE0))
                     : Image.asset(
                         assetPath!,
-                        width: 24,
-                        height: 24,
+                        width: 32,
+                        height: 32,
                         fit: BoxFit.contain,
                       ),
               ),

@@ -163,7 +163,7 @@ class _HeaderSection extends StatelessWidget {
             children: [
               Expanded(
                 child: StatCard(
-                  title: 'Coins',
+                  title: 'Diamonds',
                   value: '2,450',
                   icon: Icons.diamond,
                   assetPath: 'assets/icons/diamond.png',
@@ -242,8 +242,8 @@ class _PlayNowButton extends StatelessWidget {
             children: [
               Image.asset(
                 'assets/icons/play.png',
-                width: 20,
-                height: 20,
+                width: 28,
+                height: 28,
               ),
               const SizedBox(width: 10),
               const Text(
@@ -420,8 +420,8 @@ class _DailyGiftCard extends StatelessWidget {
               child: Center(
                 child: Image.asset(
                   'assets/icons/daily gift.png',
-                  width: 26,
-                  height: 26,
+                  width: 36,
+                  height: 36,
                 ),
               ),
             ),
@@ -500,8 +500,8 @@ class _DailyBonusDialog extends StatelessWidget {
             ),
             Image.asset(
               'assets/icons/daily gift.png',
-              width: 46,
-              height: 46,
+              width: 56,
+              height: 56,
             ),
             const SizedBox(height: 10),
             const Text(
@@ -536,8 +536,8 @@ class _DailyBonusDialog extends StatelessWidget {
                     children: [
                       Image.asset(
                         'assets/icons/diamond.png',
-                        width: 20,
-                        height: 20,
+                        width: 26,
+                        height: 26,
                       ),
                       const SizedBox(width: 8),
                       const Text(
@@ -552,7 +552,7 @@ class _DailyBonusDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   const Text(
-                    'Coins',
+                    'Diamonds',
                     style: TextStyle(
                       color: Color(0xFF8F8DA6),
                       fontWeight: FontWeight.w600,

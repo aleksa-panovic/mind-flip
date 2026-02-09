@@ -1,15 +1,13 @@
-import 'package:flutter/material.dart';
-
 class GameCardModel {
   GameCardModel({
     required this.id,
     required this.pairId,
-    required this.icon,
+    required this.assetPath,
   });
 
   final int id;
   final int pairId;
-  final IconData icon;
+  final String assetPath;
   bool isFaceUp = false;
   bool isMatched = false;
 }
