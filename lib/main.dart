@@ -4,8 +4,12 @@ import 'screens/splash/splash_screen.dart';
 import 'screens/home/home_guest_screen.dart';
 import 'screens/home/home_user_screen.dart';
 import 'screens/game/game_4x4_screen.dart';
+import 'screens/game/game_5x6_screen.dart';
+import 'screens/game/game_6x6_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
+import 'screens/result/result_screen.dart';
+import 'screens/leaderboard/leaderboard_screen.dart';
 
 void main() {
   runApp(const MindFlipApp());
@@ -38,6 +42,10 @@ class MindFlipApp extends StatelessWidget {
         '/home-guest': (context) => const HomeGuestScreen(),
         '/home-user': (context) => const HomeUserScreen(),
         '/game-4x4': (context) => const Game4x4Screen(),
+        '/game-5x6': (context) => const Game5x6Screen(),
+        '/game-6x6': (context) => const Game6x6Screen(),
+        '/result': (context) => const ResultScreen(),
+        '/leaderboard': (context) => const LeaderboardScreen(),
       },
     );
   }

@@ -32,7 +32,9 @@ class HomeUserScreen extends StatelessWidget {
                       icon: Icons.leaderboard,
                       title: 'Ranks',
                       subtitle: 'Global leaderboard',
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pushNamed(context, '/leaderboard');
+                      },
                     ),
                     const SizedBox(height: 12),
                     _ActionTile(
@@ -338,15 +340,21 @@ class _DifficultyDialog extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             _DifficultyButton(
-              label: 'Medium 4x5',
+              label: 'Medium 5x6',
               color: Color(0xFFF4C542),
-              onTap: () => Navigator.pop(context),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/game-5x6');
+              },
             ),
             const SizedBox(height: 10),
             _DifficultyButton(
               label: 'Hard 6x6',
               color: Color(0xFFF25555),
-              onTap: () => Navigator.pop(context),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/game-6x6');
+              },
             ),
           ],
         ),
