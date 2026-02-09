@@ -41,7 +41,9 @@ class HomeUserScreen extends StatelessWidget {
                       icon: Icons.shopping_bag,
                       title: 'Shop',
                       subtitle: 'Boosts & cosmetics',
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pushNamed(context, '/shop');
+                      },
                     ),
                     const SizedBox(height: 12),
                     _ActionTile(
@@ -121,6 +123,13 @@ class _HeaderSection extends StatelessWidget {
                   ],
                 ),
               ),
+              _IconChip(
+                icon: Icons.person_outline,
+                onTap: () {
+                  Navigator.pushNamed(context, '/profile');
+                },
+              ),
+              const SizedBox(width: 10),
               _IconChip(icon: Icons.notifications_none),
               const SizedBox(width: 10),
               _IconChip(icon: Icons.settings_outlined),
@@ -161,20 +170,25 @@ class _HeaderSection extends StatelessWidget {
 }
 
 class _IconChip extends StatelessWidget {
-  const _IconChip({required this.icon});
+  const _IconChip({required this.icon, this.onTap});
 
   final IconData icon;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 36,
-      height: 36,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(icon, color: Colors.white),
       ),
-      child: Icon(icon, color: Colors.white),
     );
   }
 }

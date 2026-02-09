@@ -10,6 +10,8 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/result/result_screen.dart';
 import 'screens/leaderboard/leaderboard_screen.dart';
+import 'screens/profile/profile_screen.dart';
+import 'screens/shop/shop_screen.dart';
 
 void main() {
   runApp(const MindFlipApp());
@@ -46,6 +48,8 @@ class MindFlipApp extends StatelessWidget {
         '/game-6x6': (context) => const Game6x6Screen(),
         '/result': (context) => const ResultScreen(),
         '/leaderboard': (context) => const LeaderboardScreen(),
+        '/profile': (context) => const ProfileScreen(),
+        '/shop': (context) => const ShopScreen(),
       },
     );
   }
