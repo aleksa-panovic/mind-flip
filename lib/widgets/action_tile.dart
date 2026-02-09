@@ -7,12 +7,14 @@ class ActionTile extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.onTap,
+    this.assetPath,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
+  final String? assetPath;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +43,16 @@ class ActionTile extends StatelessWidget {
                 color: const Color(0xFFEFF0FF),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(icon, color: const Color(0xFF6A5AE0)),
+              child: Center(
+                child: assetPath == null
+                    ? Icon(icon, color: const Color(0xFF6A5AE0))
+                    : Image.asset(
+                        assetPath!,
+                        width: 24,
+                        height: 24,
+                        fit: BoxFit.contain,
+                      ),
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(

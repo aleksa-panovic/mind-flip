@@ -38,6 +38,7 @@ class HomeUserScreen extends StatelessWidget {
                       icon: Icons.leaderboard,
                       title: 'Ranks',
                       subtitle: 'Global leaderboard',
+                      assetPath: 'assets/icons/rank.png',
                       onTap: () {
                         Navigator.pushNamed(context, '/leaderboard');
                       },
@@ -47,6 +48,7 @@ class HomeUserScreen extends StatelessWidget {
                       icon: Icons.shopping_bag,
                       title: 'Shop',
                       subtitle: 'Boosts & cosmetics',
+                      assetPath: 'assets/icons/shopping-bag.png',
                       onTap: () {
                         Navigator.pushNamed(context, '/shop');
                       },
@@ -56,6 +58,7 @@ class HomeUserScreen extends StatelessWidget {
                       icon: Icons.inventory_2_outlined,
                       title: 'Inventory',
                       subtitle: 'Your collection',
+                      assetPath: 'assets/icons/inventory.png',
                       onTap: () {
                         Navigator.pushNamed(context, '/inventory');
                       },
@@ -156,33 +159,36 @@ class _HeaderSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 18),
-              const Row(
-                children: [
-                  Expanded(
-                    child: StatCard(
-                      title: 'Coins',
-                      value: '2,450',
-                      icon: Icons.diamond,
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: StatCard(
-                      title: 'Best Score',
-                      value: '1,850',
-                      icon: Icons.star,
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: StatCard(
-                      title: 'Rank',
-                      value: '#42',
-                      icon: Icons.emoji_events,
-                    ),
-                  ),
-                ],
+          const Row(
+            children: [
+              Expanded(
+                child: StatCard(
+                  title: 'Coins',
+                  value: '2,450',
+                  icon: Icons.diamond,
+                  assetPath: 'assets/icons/diamond.png',
+                ),
               ),
+              SizedBox(width: 10),
+              Expanded(
+                child: StatCard(
+                  title: 'Best Score',
+                  value: '1,850',
+                  icon: Icons.star,
+                  assetPath: 'assets/icons/best_score.png',
+                ),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: StatCard(
+                  title: 'Rank',
+                  value: '#42',
+                  icon: Icons.emoji_events,
+                  assetPath: 'assets/icons/rank.png',
+                ),
+              ),
+            ],
+          ),
             ],
           ),
         );
@@ -222,7 +228,7 @@ class _PlayNowButton extends StatelessWidget {
             ),
           ],
         ),
-        child: ElevatedButton.icon(
+        child: ElevatedButton(
           onPressed: () => _showDifficultyDialog(context),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.transparent,
@@ -231,15 +237,25 @@ class _PlayNowButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(18),
             ),
           ),
-          icon: const Icon(Icons.sports_esports, color: Colors.white),
-          label: const Text(
-            'PLAY NOW',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.4,
-              fontSize: 16,
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/icons/play.png',
+                width: 20,
+                height: 20,
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                'PLAY NOW',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.4,
+                  fontSize: 16,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -401,7 +417,13 @@ class _DailyGiftCard extends StatelessWidget {
                 color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Icon(Icons.card_giftcard, color: Colors.white),
+              child: Center(
+                child: Image.asset(
+                  'assets/icons/daily gift.png',
+                  width: 26,
+                  height: 26,
+                ),
+              ),
             ),
             const SizedBox(width: 14),
             const Expanded(
@@ -476,7 +498,11 @@ class _DailyBonusDialog extends StatelessWidget {
                 ),
               ),
             ),
-            const Icon(Icons.card_giftcard, size: 46, color: Color(0xFF6A5AE0)),
+            Image.asset(
+              'assets/icons/daily gift.png',
+              width: 46,
+              height: 46,
+            ),
             const SizedBox(height: 10),
             const Text(
               'Daily Bonus!',
@@ -507,10 +533,14 @@ class _DailyBonusDialog extends StatelessWidget {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.diamond, color: Color(0xFF49E3FF)),
-                      SizedBox(width: 8),
-                      Text(
+                    children: [
+                      Image.asset(
+                        'assets/icons/diamond.png',
+                        width: 20,
+                        height: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
                         '+250',
                         style: TextStyle(
                           color: Color(0xFF6A5AE0),

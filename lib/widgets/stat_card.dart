@@ -6,11 +6,13 @@ class StatCard extends StatelessWidget {
     required this.title,
     required this.value,
     required this.icon,
+    this.assetPath,
   });
 
   final String title;
   final String value;
   final IconData icon;
+  final String? assetPath;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +36,14 @@ class StatCard extends StatelessWidget {
           const SizedBox(height: 6),
           Row(
             children: [
-              Icon(icon, size: 16, color: Colors.white),
+              assetPath == null
+                  ? Icon(icon, size: 16, color: Colors.white)
+                  : Image.asset(
+                      assetPath!,
+                      width: 16,
+                      height: 16,
+                      fit: BoxFit.contain,
+                    ),
               const SizedBox(width: 6),
               Flexible(
                 child: Text(

@@ -154,6 +154,7 @@ class _TopThree extends StatelessWidget {
           score: '2,340',
           ringColor: Color(0xFFB9C1D9),
           medalColor: Color(0xFFE3E6F2),
+          trophyAsset: 'assets/icons/second_place.png',
         ),
         _PodiumCard(
           rank: 1,
@@ -162,6 +163,7 @@ class _TopThree extends StatelessWidget {
           ringColor: Color(0xFFF2C94C),
           medalColor: Color(0xFFF2C94C),
           isWinner: true,
+          trophyAsset: 'assets/icons/first_place.png',
         ),
         _PodiumCard(
           rank: 3,
@@ -169,6 +171,7 @@ class _TopThree extends StatelessWidget {
           score: '2,280',
           ringColor: Color(0xFFFFA36C),
           medalColor: Color(0xFFFFA36C),
+          trophyAsset: 'assets/icons/third_place.png',
         ),
       ],
     );
@@ -183,6 +186,7 @@ class _PodiumCard extends StatelessWidget {
     required this.ringColor,
     required this.medalColor,
     this.isWinner = false,
+    this.trophyAsset,
   });
 
   final int rank;
@@ -191,6 +195,7 @@ class _PodiumCard extends StatelessWidget {
   final Color ringColor;
   final Color medalColor;
   final bool isWinner;
+  final String? trophyAsset;
 
   @override
   Widget build(BuildContext context) {
@@ -206,7 +211,13 @@ class _PodiumCard extends StatelessWidget {
             border: Border.all(color: ringColor, width: 3),
           ),
           child: Center(
-            child: Icon(Icons.emoji_events, color: medalColor, size: 28),
+            child: trophyAsset == null
+                ? Icon(Icons.emoji_events, color: medalColor, size: 28)
+                : Image.asset(
+                    trophyAsset!,
+                    width: isWinner ? 34 : 28,
+                    height: isWinner ? 34 : 28,
+                  ),
           ),
         ),
         const SizedBox(height: 8),

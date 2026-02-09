@@ -147,7 +147,11 @@ class _ResultContent extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.diamond, color: Color(0xFF49E3FF)),
+            Image.asset(
+              'assets/icons/diamond.png',
+              width: 18,
+              height: 18,
+            ),
             const SizedBox(width: 8),
             Text(
               '+$coins Coins Earned!',
