@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:provider/provider.dart';
+
+import '../../providers/skin_provider.dart';
 import '../../widgets/gradient_header.dart';
+import '../../widgets/fade_slide_in.dart';
 
 class InventoryScreen extends StatelessWidget {
   const InventoryScreen({super.key});
@@ -8,7 +12,7 @@ class InventoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6FB),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: const [
           _Header(),
@@ -143,12 +147,13 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return Row(
       children: [
         Text(
           title,
-          style: const TextStyle(
-            color: Color(0xFF2F2B3A),
+          style: TextStyle(
+            color: onSurface,
             fontWeight: FontWeight.w700,
             fontSize: 14,
           ),
@@ -172,6 +177,7 @@ class _CardSkinGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = context.watch<SkinProvider>();
     return GridView.count(
       crossAxisCount: 3,
       crossAxisSpacing: 12,
@@ -179,24 +185,47 @@ class _CardSkinGrid extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       childAspectRatio: 0.9,
-      children: const [
-        _SkinTile(
-          title: 'Emoji (Default)',
-          assetPath: 'assets/card_skins/emoji_skin/e1.png',
-          isSelected: true,
-        ),
-        _SkinTile(
-          title: 'Animal',
-          assetPath: 'assets/card_skins/animal_skin/a1.png',
-        ),
-        _SkinTile(
-          title: 'Space',
-          assetPath: 'assets/card_skins/space_skin/s1.png',
-        ),
-        _SkinTile(
-          title: 'Sport',
-          assetPath: 'assets/card_skins/sport_skin/Sp1.png',
-        ),
+      children: [
+        if (skin.ownedFrontSets.contains('emoji'))
+          FadeSlideIn(
+            delay: const Duration(milliseconds: 0),
+            child: _SkinTile(
+              title: 'Emoji (Default)',
+              assetPath: 'assets/card_skins/emoji_skin/e1.png',
+              isSelected: skin.currentFrontSet == 'emoji',
+              onTap: () => skin.setFront('emoji'),
+            ),
+          ),
+        if (skin.ownedFrontSets.contains('animal'))
+          FadeSlideIn(
+            delay: const Duration(milliseconds: 80),
+            child: _SkinTile(
+              title: 'Animal',
+              assetPath: 'assets/card_skins/animal_skin/a1.png',
+              isSelected: skin.currentFrontSet == 'animal',
+              onTap: () => skin.setFront('animal'),
+            ),
+          ),
+        if (skin.ownedFrontSets.contains('space'))
+          FadeSlideIn(
+            delay: const Duration(milliseconds: 160),
+            child: _SkinTile(
+              title: 'Space',
+              assetPath: 'assets/card_skins/space_skin/s1.png',
+              isSelected: skin.currentFrontSet == 'space',
+              onTap: () => skin.setFront('space'),
+            ),
+          ),
+        if (skin.ownedFrontSets.contains('sport'))
+          FadeSlideIn(
+            delay: const Duration(milliseconds: 240),
+            child: _SkinTile(
+              title: 'Sport',
+              assetPath: 'assets/card_skins/sport_skin/Sp1.png',
+              isSelected: skin.currentFrontSet == 'sport',
+              onTap: () => skin.setFront('sport'),
+            ),
+          ),
       ],
     );
   }
@@ -208,72 +237,80 @@ class _SkinTile extends StatelessWidget {
     this.icon,
     this.assetPath,
     this.isSelected = false,
+    this.onTap,
   });
 
   final String title;
   final IconData? icon;
   final String? assetPath;
   final bool isSelected;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: isSelected ? const Color(0xFF37D07A) : Colors.transparent,
-          width: 1.4,
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x11000000),
-            blurRadius: 12,
-            offset: Offset(0, 8),
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF37D07A) : Colors.transparent,
+            width: 1.4,
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Stack(
-            alignment: Alignment.topRight,
-            children: [
-              Container(
-                height: 64,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF2EAFE),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Center(
-                  child: assetPath != null
-                      ? Image.asset(assetPath!, width: 36, height: 36)
-                      : Icon(icon, color: const Color(0xFF6A5AE0), size: 28),
-                ),
-              ),
-              if (isSelected)
-                Container(
-                  width: 18,
-                  height: 18,
-                  margin: const EdgeInsets.only(top: 6, right: 6),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF37D07A),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.check, color: Colors.white, size: 12),
-                ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: const TextStyle(
-              color: Color(0xFF2F2B3A),
-              fontWeight: FontWeight.w700,
-              fontSize: 12,
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x11000000),
+              blurRadius: 12,
+              offset: Offset(0, 8),
             ),
-          ),
-        ],
+          ],
+        ),
+        child: Column(
+          children: [
+            Stack(
+              alignment: Alignment.topRight,
+              children: [
+                Container(
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF2EAFE),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Center(
+                    child: assetPath != null
+                        ? Image.asset(assetPath!, width: 36, height: 36)
+                        : Icon(icon, color: const Color(0xFF6A5AE0), size: 28),
+                  ),
+                ),
+                if (isSelected)
+                  Container(
+                    width: 18,
+                    height: 18,
+                    margin: const EdgeInsets.only(top: 6, right: 6),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF37D07A),
+                      shape: BoxShape.circle,
+                    ),
+                    child:
+                        const Icon(Icons.check, color: Colors.white, size: 12),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(
+                color: onSurface,
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -284,6 +321,7 @@ class _BackSkinGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final skin = context.watch<SkinProvider>();
     return GridView.count(
       crossAxisCount: 2,
       crossAxisSpacing: 14,
@@ -291,24 +329,47 @@ class _BackSkinGrid extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       childAspectRatio: 1.05,
-      children: const [
-        _BackSkinTile(
-          title: 'Default (Current)',
-          assetPath: 'assets/back_skins/default_skin.png',
-          isEquipped: true,
-        ),
-        _BackSkinTile(
-          title: 'Galaxy',
-          assetPath: 'assets/back_skins/galaxy_skin.png',
-        ),
-        _BackSkinTile(
-          title: 'Nature',
-          assetPath: 'assets/back_skins/nature skin.png',
-        ),
-        _BackSkinTile(
-          title: 'Lava',
-          assetPath: 'assets/back_skins/lava_skin.png',
-        ),
+      children: [
+        if (skin.ownedBackSkins.contains('default'))
+          FadeSlideIn(
+            delay: const Duration(milliseconds: 0),
+            child: _BackSkinTile(
+              title: 'Default',
+              assetPath: 'assets/back_skins/default_skin.png',
+              isEquipped: skin.currentBackSkin == 'default',
+              onTap: () => skin.setBack('default'),
+            ),
+          ),
+        if (skin.ownedBackSkins.contains('galaxy'))
+          FadeSlideIn(
+            delay: const Duration(milliseconds: 80),
+            child: _BackSkinTile(
+              title: 'Galaxy',
+              assetPath: 'assets/back_skins/galaxy_skin.png',
+              isEquipped: skin.currentBackSkin == 'galaxy',
+              onTap: () => skin.setBack('galaxy'),
+            ),
+          ),
+        if (skin.ownedBackSkins.contains('nature'))
+          FadeSlideIn(
+            delay: const Duration(milliseconds: 160),
+            child: _BackSkinTile(
+              title: 'Nature',
+              assetPath: 'assets/back_skins/nature skin.png',
+              isEquipped: skin.currentBackSkin == 'nature',
+              onTap: () => skin.setBack('nature'),
+            ),
+          ),
+        if (skin.ownedBackSkins.contains('lava'))
+          FadeSlideIn(
+            delay: const Duration(milliseconds: 240),
+            child: _BackSkinTile(
+              title: 'Lava',
+              assetPath: 'assets/back_skins/lava_skin.png',
+              isEquipped: skin.currentBackSkin == 'lava',
+              onTap: () => skin.setBack('lava'),
+            ),
+          ),
       ],
     );
   }
@@ -319,72 +380,79 @@ class _BackSkinTile extends StatelessWidget {
     required this.title,
     required this.assetPath,
     this.isEquipped = false,
+    this.onTap,
   });
 
   final String title;
   final String assetPath;
   final bool isEquipped;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: isEquipped ? const Color(0xFF37D07A) : Colors.transparent,
-          width: 1.4,
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x11000000),
-            blurRadius: 12,
-            offset: Offset(0, 8),
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: isEquipped ? const Color(0xFF37D07A) : Colors.transparent,
+            width: 1.4,
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-            height: 70,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF2EAFE),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.asset(assetPath, fit: BoxFit.cover),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: const TextStyle(
-              color: Color(0xFF2F2B3A),
-              fontWeight: FontWeight.w700,
-              fontSize: 12,
-            ),
-          ),
-          if (isEquipped) ...[
-            const SizedBox(height: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: const Color(0xFF37D07A),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Text(
-                'EQUIPPED',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x11000000),
+              blurRadius: 12,
+              offset: Offset(0, 8),
             ),
           ],
-        ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              height: 70,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF2EAFE),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(assetPath, fit: BoxFit.cover),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(
+                color: onSurface,
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+              ),
+            ),
+            if (isEquipped) ...[
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF37D07A),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Text(
+                  'EQUIPPED',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

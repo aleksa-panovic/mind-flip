@@ -11,7 +11,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6FB),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: const [
           _Header(),
@@ -23,17 +23,6 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   _StatsRow(),
                   SizedBox(height: 18),
-                  Text(
-                    'Achievements',
-                    style: TextStyle(
-                      color: Color(0xFF2F2B3A),
-                      fontWeight: FontWeight.w700,
-                      fontSize: 15,
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  _AchievementsRow(),
-                  SizedBox(height: 22),
                   Text(
                     'Statistics',
                     style: TextStyle(
@@ -210,10 +199,11 @@ class _StatPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cardColor = Theme.of(context).cardColor;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(18),
         boxShadow: const [
           BoxShadow(
@@ -248,92 +238,17 @@ class _StatPill extends StatelessWidget {
   }
 }
 
-class _AchievementsRow extends StatelessWidget {
-  const _AchievementsRow();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: const [
-        _AchievementTile(
-          icon: Icons.emoji_events,
-          label: 'Champion',
-          color: Color(0xFFFFF4C1),
-        ),
-        SizedBox(width: 12),
-        _AchievementTile(
-          icon: Icons.flash_on,
-          label: 'Speed Demon',
-          color: Color(0xFFDDF7FF),
-        ),
-        SizedBox(width: 12),
-        _AchievementTile(
-          icon: Icons.local_fire_department,
-          label: 'Hot Streak',
-          color: Color(0xFFFFE4E0),
-        ),
-        SizedBox(width: 12),
-        _AchievementTile(
-          icon: Icons.ads_click,
-          label: 'Perfect',
-          color: Color(0xFFE4FBEA),
-        ),
-      ],
-    );
-  }
-}
-
-class _AchievementTile extends StatelessWidget {
-  const _AchievementTile({
-    required this.icon,
-    required this.label,
-    required this.color,
-  });
-
-  final IconData icon;
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-        children: [
-          Container(
-            height: 60,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Center(
-              child: Icon(icon, color: const Color(0xFF6A5AE0)),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Color(0xFF6E6B7C),
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _StatsCard extends StatelessWidget {
   const _StatsCard();
 
   @override
   Widget build(BuildContext context) {
+    final cardColor = Theme.of(context).cardColor;
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(18),
         boxShadow: const [
           BoxShadow(

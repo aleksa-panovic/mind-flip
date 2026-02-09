@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -198,56 +198,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 18),
                     Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            height: 1,
-                            color: const Color(0xFFE5E7EB),
-                          ),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: Text(
-                            'or continue with',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF9CA3AF),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            height: 1,
-                            color: const Color(0xFFE5E7EB),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _SocialButton(
-                            label: 'Google',
-                            onPressed: () {},
-                            isDark: false,
-                            icon: const _GoogleIcon(),
-                          ),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: _SocialButton(
-                            label: 'Apple',
-                            onPressed: () {},
-                            isDark: true,
-                            icon: const Icon(Icons.apple, size: 18),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 18),
-                    Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text(
@@ -320,74 +270,6 @@ class _InputField extends StatelessWidget {
             vertical: 14,
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _SocialButton extends StatelessWidget {
-  final String label;
-  final VoidCallback onPressed;
-  final bool isDark;
-  final Widget icon;
-
-  const _SocialButton({
-    required this.label,
-    required this.onPressed,
-    required this.isDark,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          elevation: 0,
-          backgroundColor: isDark ? Colors.black : Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-            side: BorderSide(
-              color: isDark ? Colors.black : const Color(0xFFE5E7EB),
-            ),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            IconTheme(
-              data: IconThemeData(color: isDark ? Colors.white : Colors.black),
-              child: icon,
-            ),
-            const SizedBox(width: 10),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-                color: isDark ? Colors.white : const Color(0xFF111827),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _GoogleIcon extends StatelessWidget {
-  const _GoogleIcon();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Text(
-      'G',
-      style: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w900,
-        color: Colors.black,
       ),
     );
   }

@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/skin_provider.dart';
+import '../../widgets/fade_slide_in.dart';
 
 class ShopScreen extends StatelessWidget {
   const ShopScreen({super.key});
@@ -6,7 +10,7 @@ class ShopScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6FB),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
@@ -35,6 +39,8 @@ class _TitleBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final diamonds = context.watch<SkinProvider>().diamonds;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return Row(
       children: [
         InkWell(
@@ -51,11 +57,21 @@ class _TitleBar extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-        const Text(
+        Text(
           'Shop',
           style: TextStyle(
-            color: Color(0xFF2F2B3A),
+            color: onSurface,
             fontSize: 22,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const Spacer(),
+        Image.asset('assets/icons/diamond.png', width: 18, height: 18),
+        const SizedBox(width: 6),
+        Text(
+          diamonds.toString(),
+          style: TextStyle(
+            color: onSurface,
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -71,10 +87,11 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return Text(
       text,
-      style: const TextStyle(
-        color: Color(0xFF2F2B3A),
+      style: TextStyle(
+        color: onSurface,
         fontWeight: FontWeight.w700,
         fontSize: 14,
       ),
@@ -95,20 +112,32 @@ class _SkinGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       childAspectRatio: 0.85,
       children: const [
-        _SkinCard(
-          title: 'Animal',
-          price: '\$3.99',
-          assetPath: 'assets/card_skins/animal_skin/a1.png',
+        FadeSlideIn(
+          delay: Duration(milliseconds: 0),
+          child: _SkinCard(
+            title: 'Animal',
+            priceLabel: '\$3.99',
+            assetPath: 'assets/card_skins/animal_skin/a1.png',
+            skinKey: 'animal',
+          ),
         ),
-        _SkinCard(
-          title: 'Space',
-          price: '\$5.99',
-          assetPath: 'assets/card_skins/space_skin/s1.png',
+        FadeSlideIn(
+          delay: Duration(milliseconds: 80),
+          child: _SkinCard(
+            title: 'Space',
+            priceLabel: '\$5.99',
+            assetPath: 'assets/card_skins/space_skin/s1.png',
+            skinKey: 'space',
+          ),
         ),
-        _SkinCard(
-          title: 'Sport',
-          price: '\$4.99',
-          assetPath: 'assets/card_skins/sport_skin/Sp1.png',
+        FadeSlideIn(
+          delay: Duration(milliseconds: 160),
+          child: _SkinCard(
+            title: 'Sport',
+            priceLabel: '\$4.99',
+            assetPath: 'assets/card_skins/sport_skin/Sp1.png',
+            skinKey: 'sport',
+          ),
         ),
       ],
     );
@@ -128,23 +157,41 @@ class _BackSkinGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       childAspectRatio: 0.85,
       children: const [
-        _SkinCard(
-          title: 'Galaxy',
-          price: '1000',
-          assetPath: 'assets/back_skins/galaxy_skin.png',
-          isDiamond: true,
+        FadeSlideIn(
+          delay: Duration(milliseconds: 0),
+          child: _SkinCard(
+            title: 'Galaxy',
+            diamondPrice: 1000,
+            priceLabel: '1000',
+            assetPath: 'assets/back_skins/galaxy_skin.png',
+            isDiamond: true,
+            skinKey: 'galaxy',
+            isBack: true,
+          ),
         ),
-        _SkinCard(
-          title: 'Nature',
-          price: '2000',
-          assetPath: 'assets/back_skins/nature skin.png',
-          isDiamond: true,
+        FadeSlideIn(
+          delay: Duration(milliseconds: 80),
+          child: _SkinCard(
+            title: 'Nature',
+            diamondPrice: 2000,
+            priceLabel: '2000',
+            assetPath: 'assets/back_skins/nature skin.png',
+            isDiamond: true,
+            skinKey: 'nature',
+            isBack: true,
+          ),
         ),
-        _SkinCard(
-          title: 'Lava',
-          price: '5000',
-          assetPath: 'assets/back_skins/lava_skin.png',
-          isDiamond: true,
+        FadeSlideIn(
+          delay: Duration(milliseconds: 160),
+          child: _SkinCard(
+            title: 'Lava',
+            diamondPrice: 5000,
+            priceLabel: '5000',
+            assetPath: 'assets/back_skins/lava_skin.png',
+            isDiamond: true,
+            skinKey: 'lava',
+            isBack: true,
+          ),
         ),
       ],
     );
@@ -154,24 +201,37 @@ class _BackSkinGrid extends StatelessWidget {
 class _SkinCard extends StatelessWidget {
   const _SkinCard({
     required this.title,
-    required this.price,
+    this.priceLabel,
+    this.diamondPrice,
     this.icon,
     this.assetPath,
     this.isDiamond = false,
+    required this.skinKey,
+    this.isBack = false,
   });
 
   final String title;
-  final String price;
+  final String? priceLabel;
+  final int? diamondPrice;
   final IconData? icon;
   final String? assetPath;
   final bool isDiamond;
+  final String skinKey;
+  final bool isBack;
 
   @override
   Widget build(BuildContext context) {
+    final skin = context.watch<SkinProvider>();
+    final owned = isBack
+        ? skin.ownedBackSkins.contains(skinKey)
+        : skin.ownedFrontSets.contains(skinKey);
+    final label = priceLabel ??
+        (diamondPrice != null ? diamondPrice.toString() : '');
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: const [
           BoxShadow(
@@ -199,34 +259,50 @@ class _SkinCard extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             title,
-            style: const TextStyle(
-              color: Color(0xFF2F2B3A),
+            style: TextStyle(
+              color: onSurface,
               fontWeight: FontWeight.w700,
             ),
           ),
           const Spacer(),
           Row(
             children: [
-              isDiamond
-                  ? Image.asset(
-                      'assets/icons/diamond.png',
-                      width: 16,
-                      height: 16,
-                    )
-                  : const Icon(Icons.attach_money,
-                      size: 16, color: Color(0xFF3BD27A)),
+              if (isDiamond)
+                Image.asset(
+                  'assets/icons/diamond.png',
+                  width: 16,
+                  height: 16,
+                )
+              else
+                const Icon(Icons.attach_money,
+                    size: 16, color: Color(0xFF3BD27A)),
               Text(
-                price,
-                style: const TextStyle(
-                  color: Color(0xFF2F2B3A),
+                label,
+                style: TextStyle(
+                  color: onSurface,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               const Spacer(),
               _BuyButton(
-                label: 'Buy',
-                color: Color(0xFF3BD27A),
+                label: owned ? 'Owned' : 'Buy',
+                color: owned ? const Color(0xFFB8B6C9) : const Color(0xFF3BD27A),
                 textColor: Colors.white,
+                onTap: () {
+                  if (owned) return;
+                  if (!isDiamond) {
+                    _showInfo(context, 'Card skins will be purchasable later.');
+                    return;
+                  }
+                  final ok = isBack
+                      ? skin.buyBack(skinKey, diamondPrice ?? 0)
+                      : skin.buyFront(skinKey, diamondPrice ?? 0);
+                  if (!ok) {
+                    _showNotEnoughDiamonds(context);
+                  } else {
+                    _showBought(context);
+                  }
+                },
               ),
             ],
           ),
@@ -242,28 +318,88 @@ class _BuyButton extends StatelessWidget {
     required this.label,
     required this.color,
     required this.textColor,
+    this.onTap,
   });
 
   final String label;
   final Color color;
   final Color textColor;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: textColor,
-          fontWeight: FontWeight.w700,
-          fontSize: 12,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: textColor,
+            fontWeight: FontWeight.w700,
+            fontSize: 12,
+          ),
         ),
       ),
     );
   }
+}
+
+void _showNotEnoughDiamonds(BuildContext context) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: const Color(0xFF2F2B3A),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      content: Row(
+        children: [
+          Image.asset(
+            'assets/icons/diamond.png',
+            width: 18,
+            height: 18,
+          ),
+          const SizedBox(width: 10),
+          const Expanded(
+            child: Text(
+              'Not enough diamonds.',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+      duration: const Duration(seconds: 2),
+    ),
+  );
+}
+
+void _showInfo(BuildContext context, String msg) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: const Color(0xFF2F2B3A),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      content: Text(msg, style: const TextStyle(fontWeight: FontWeight.w600)),
+      duration: const Duration(seconds: 2),
+    ),
+  );
+}
+
+void _showBought(BuildContext context) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: const Color(0xFF2F2B3A),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      content: const Text(
+        'Purchase successful!',
+        style: TextStyle(fontWeight: FontWeight.w600),
+      ),
+      duration: const Duration(seconds: 2),
+    ),
+  );
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../widgets/gradient_header.dart';
+import '../../widgets/fade_slide_in.dart';
 
 class LeaderboardScreen extends StatelessWidget {
   const LeaderboardScreen({super.key});
@@ -8,7 +9,7 @@ class LeaderboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F3FF),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: const [
           _Header(),
@@ -147,31 +148,40 @@ class _TopThree extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: const [
-        _PodiumCard(
-          rank: 2,
-          name: 'GameQueen',
-          score: '2,340',
-          ringColor: Color(0xFFB9C1D9),
-          medalColor: Color(0xFFE3E6F2),
-          trophyAsset: 'assets/icons/second_place.png',
+      children: [
+        const FadeSlideIn(
+          delay: Duration(milliseconds: 0),
+          child: _PodiumCard(
+            rank: 2,
+            name: 'GameQueen',
+            score: '2,340',
+            ringColor: Color(0xFFB9C1D9),
+            medalColor: Color(0xFFE3E6F2),
+            trophyAsset: 'assets/icons/second_place.png',
+          ),
         ),
-        _PodiumCard(
-          rank: 1,
-          name: 'ProGamer99',
-          score: '2,450',
-          ringColor: Color(0xFFF2C94C),
-          medalColor: Color(0xFFF2C94C),
-          isWinner: true,
-          trophyAsset: 'assets/icons/first_place.png',
+        const FadeSlideIn(
+          delay: Duration(milliseconds: 80),
+          child: _PodiumCard(
+            rank: 1,
+            name: 'ProGamer99',
+            score: '2,450',
+            ringColor: Color(0xFFF2C94C),
+            medalColor: Color(0xFFF2C94C),
+            isWinner: true,
+            trophyAsset: 'assets/icons/first_place.png',
+          ),
         ),
-        _PodiumCard(
-          rank: 3,
-          name: 'MemoryKing',
-          score: '2,280',
-          ringColor: Color(0xFFFFA36C),
-          medalColor: Color(0xFFFFA36C),
-          trophyAsset: 'assets/icons/third_place.png',
+        const FadeSlideIn(
+          delay: Duration(milliseconds: 160),
+          child: _PodiumCard(
+            rank: 3,
+            name: 'MemoryKing',
+            score: '2,280',
+            ringColor: Color(0xFFFFA36C),
+            medalColor: Color(0xFFFFA36C),
+            trophyAsset: 'assets/icons/third_place.png',
+          ),
         ),
       ],
     );
@@ -257,40 +267,55 @@ class _LeaderboardList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: const [
-        _LeaderRow(
-          rank: 4,
-          name: 'FlipMaster',
-          score: 'Best: 2,150',
-          icon: Icons.sentiment_satisfied_alt,
+        FadeSlideIn(
+          delay: Duration(milliseconds: 0),
+          child: _LeaderRow(
+            rank: 4,
+            name: 'FlipMaster',
+            score: 'Best: 2,150',
+            icon: Icons.sentiment_satisfied_alt,
+          ),
         ),
         SizedBox(height: 12),
-        _LeaderRow(
-          rank: 5,
-          name: 'BrainWave',
-          score: 'Best: 2,080',
-          icon: Icons.psychology_alt,
+        FadeSlideIn(
+          delay: Duration(milliseconds: 80),
+          child: _LeaderRow(
+            rank: 5,
+            name: 'BrainWave',
+            score: 'Best: 2,080',
+            icon: Icons.psychology_alt,
+          ),
         ),
         SizedBox(height: 12),
-        _LeaderRow(
-          rank: 42,
-          name: 'Alex_Pro',
-          score: 'Best: 1,850',
-          icon: Icons.sentiment_satisfied_alt,
-          isYou: true,
+        FadeSlideIn(
+          delay: Duration(milliseconds: 160),
+          child: _LeaderRow(
+            rank: 42,
+            name: 'Alex_Pro',
+            score: 'Best: 1,850',
+            icon: Icons.sentiment_satisfied_alt,
+            isYou: true,
+          ),
         ),
         SizedBox(height: 12),
-        _LeaderRow(
-          rank: 43,
-          name: 'CardShark',
-          score: 'Best: 1,820',
-          icon: Icons.catching_pokemon,
+        FadeSlideIn(
+          delay: Duration(milliseconds: 240),
+          child: _LeaderRow(
+            rank: 43,
+            name: 'CardShark',
+            score: 'Best: 1,820',
+            icon: Icons.catching_pokemon,
+          ),
         ),
         SizedBox(height: 12),
-        _LeaderRow(
-          rank: 44,
-          name: 'QuickMind',
-          score: 'Best: 1,790',
-          icon: Icons.flash_on,
+        FadeSlideIn(
+          delay: Duration(milliseconds: 320),
+          child: _LeaderRow(
+            rank: 44,
+            name: 'QuickMind',
+            score: 'Best: 1,790',
+            icon: Icons.flash_on,
+          ),
         ),
       ],
     );
@@ -314,10 +339,13 @@ class _LeaderRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       decoration: BoxDecoration(
-        color: isYou ? const Color(0xFFF2EAFE) : Colors.white,
+        color: isYou
+            ? const Color(0xFFF2EAFE)
+            : Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: isYou ? const Color(0xFFB08CFF) : Colors.transparent,
@@ -362,9 +390,9 @@ class _LeaderRow extends StatelessWidget {
                   children: [
                     Text(
                       name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF2F2B3A),
+                        color: onSurface,
                       ),
                     ),
                     if (isYou) ...[
@@ -393,8 +421,8 @@ class _LeaderRow extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   score,
-                  style: const TextStyle(
-                    color: Color(0xFF8F8DA6),
+                  style: TextStyle(
+                    color: onSurface.withOpacity(0.6),
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),

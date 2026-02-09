@@ -5,6 +5,9 @@ import '../../providers/auth_provider.dart';
 import '../../widgets/action_tile.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/icon_chip.dart';
+import '../../providers/skin_provider.dart';
+import '../../widgets/fade_slide_in.dart';
+import '../../providers/theme_provider.dart';
 
 class HomeUserScreen extends StatelessWidget {
   const HomeUserScreen({super.key});
@@ -12,7 +15,7 @@ class HomeUserScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6FB),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -34,34 +37,43 @@ class HomeUserScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    ActionTile(
-                      icon: Icons.leaderboard,
-                      title: 'Ranks',
-                      subtitle: 'Global leaderboard',
-                      assetPath: 'assets/icons/rank.png',
-                      onTap: () {
-                        Navigator.pushNamed(context, '/leaderboard');
-                      },
+                    FadeSlideIn(
+                      delay: const Duration(milliseconds: 0),
+                      child: ActionTile(
+                        icon: Icons.leaderboard,
+                        title: 'Ranks',
+                        subtitle: 'Global leaderboard',
+                        assetPath: 'assets/icons/rank.png',
+                        onTap: () {
+                          Navigator.pushNamed(context, '/leaderboard');
+                        },
+                      ),
                     ),
                     const SizedBox(height: 12),
-                    ActionTile(
-                      icon: Icons.shopping_bag,
-                      title: 'Shop',
-                      subtitle: 'Boosts & cosmetics',
-                      assetPath: 'assets/icons/shopping-bag.png',
-                      onTap: () {
-                        Navigator.pushNamed(context, '/shop');
-                      },
+                    FadeSlideIn(
+                      delay: const Duration(milliseconds: 80),
+                      child: ActionTile(
+                        icon: Icons.shopping_bag,
+                        title: 'Shop',
+                        subtitle: 'Boosts & cosmetics',
+                        assetPath: 'assets/icons/shopping-bag.png',
+                        onTap: () {
+                          Navigator.pushNamed(context, '/shop');
+                        },
+                      ),
                     ),
                     const SizedBox(height: 12),
-                    ActionTile(
-                      icon: Icons.inventory_2_outlined,
-                      title: 'Inventory',
-                      subtitle: 'Your collection',
-                      assetPath: 'assets/icons/inventory.png',
-                      onTap: () {
-                        Navigator.pushNamed(context, '/inventory');
-                      },
+                    FadeSlideIn(
+                      delay: const Duration(milliseconds: 160),
+                      child: ActionTile(
+                        icon: Icons.inventory_2_outlined,
+                        title: 'Inventory',
+                        subtitle: 'Your collection',
+                        assetPath: 'assets/icons/inventory.png',
+                        onTap: () {
+                          Navigator.pushNamed(context, '/inventory');
+                        },
+                      ),
                     ),
                     const SizedBox(height: 20),
                     const _DailyGiftCard(),
@@ -153,41 +165,48 @@ class _HeaderSection extends StatelessWidget {
                 },
               ),
               const SizedBox(width: 10),
-              const IconChip(icon: Icons.notifications_none),
-              const SizedBox(width: 10),
-              const IconChip(icon: Icons.settings_outlined),
+              IconChip(
+                icon: Icons.settings_outlined,
+                onTap: () {
+                  Navigator.pushNamed(context, '/settings');
+                },
+              ),
             ],
           ),
           const SizedBox(height: 18),
-          const Row(
-            children: [
-              Expanded(
-                child: StatCard(
-                  title: 'Diamonds',
-                  value: '2,450',
-                  icon: Icons.diamond,
-                  assetPath: 'assets/icons/diamond.png',
-                ),
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: StatCard(
-                  title: 'Best Score',
-                  value: '1,850',
-                  icon: Icons.star,
-                  assetPath: 'assets/icons/best_score.png',
-                ),
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: StatCard(
-                  title: 'Rank',
-                  value: '#42',
-                  icon: Icons.emoji_events,
-                  assetPath: 'assets/icons/rank.png',
-                ),
-              ),
-            ],
+          Consumer<SkinProvider>(
+            builder: (context, skin, _) {
+              return Row(
+                children: [
+                  Expanded(
+                    child: StatCard(
+                      title: 'Diamonds',
+                      value: skin.diamonds.toString(),
+                      icon: Icons.diamond,
+                      assetPath: 'assets/icons/diamond.png',
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  const Expanded(
+                    child: StatCard(
+                      title: 'Best Score',
+                      value: '1,850',
+                      icon: Icons.star,
+                      assetPath: 'assets/icons/best_score.png',
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  const Expanded(
+                    child: StatCard(
+                      title: 'Rank',
+                      value: '#42',
+                      icon: Icons.emoji_events,
+                      assetPath: 'assets/icons/rank.png',
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
             ],
           ),
@@ -604,7 +623,15 @@ class _DailyBonusDialog extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    context.read<SkinProvider>().addDiamonds(250);
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('You claimed 250 diamonds!'),
+                      ),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,

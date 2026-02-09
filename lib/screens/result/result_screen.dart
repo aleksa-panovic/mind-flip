@@ -28,6 +28,7 @@ class ResultScreen extends StatelessWidget {
       body: Stack(
         children: [
           const _ResultBackground(),
+          const _ConfettiLayer(),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(22, 18, 22, 18),
@@ -42,6 +43,97 @@ class ResultScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ConfettiLayer extends StatefulWidget {
+  const _ConfettiLayer();
+
+  @override
+  State<_ConfettiLayer> createState() => _ConfettiLayerState();
+}
+
+class _ConfettiLayerState extends State<_ConfettiLayer> {
+  bool _play = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (!mounted) return;
+      setState(() => _play = true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 800),
+        opacity: _play ? 1 : 0,
+        child: Stack(
+          children: [
+            _ConfettiPiece(
+              start: const Offset(0.2, -0.1),
+              end: const Offset(0.1, 0.35),
+              color: const Color(0xFF49E3FF),
+              delay: 0,
+            ),
+            _ConfettiPiece(
+              start: const Offset(0.8, -0.08),
+              end: const Offset(0.7, 0.42),
+              color: const Color(0xFFF9D34E),
+              delay: 120,
+            ),
+            _ConfettiPiece(
+              start: const Offset(0.5, -0.12),
+              end: const Offset(0.55, 0.5),
+              color: const Color(0xFF37D07A),
+              delay: 220,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ConfettiPiece extends StatelessWidget {
+  const _ConfettiPiece({
+    required this.start,
+    required this.end,
+    required this.color,
+    required this.delay,
+  });
+
+  final Offset start;
+  final Offset end;
+  final Color color;
+  final int delay;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<Offset>(
+      tween: Tween(begin: start, end: end),
+      duration: Duration(milliseconds: 1200 + delay),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, child) {
+        return Align(
+          alignment: Alignment(value.dx * 2 - 1, value.dy * 2 - 1),
+          child: Transform.rotate(
+            angle: value.dy * 6,
+            child: Container(
+              width: 10,
+              height: 22,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

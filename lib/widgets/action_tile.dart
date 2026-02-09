@@ -18,13 +18,14 @@ class ActionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: const [
             BoxShadow(
@@ -61,8 +62,8 @@ class ActionTile extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: Color(0xFF2F2B3A),
+                    style: TextStyle(
+                      color: onSurface,
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
                     ),
@@ -70,8 +71,8 @@ class ActionTile extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: const TextStyle(
-                      color: Color(0xFF8F8DA6),
+                    style: TextStyle(
+                      color: onSurface.withOpacity(0.6),
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                     ),

@@ -84,7 +84,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    final bg = const Color(0xFFF5F6FA);
+    final bg = Theme.of(context).scaffoldBackgroundColor;
     final purple1 = const Color(0xFF7B5CFF);
     final purple2 = const Color(0xFF6A5BD7);
     final textDark = const Color(0xFF2B2B2B);

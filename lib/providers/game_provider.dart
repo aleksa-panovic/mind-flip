@@ -12,7 +12,7 @@ class GameProvider extends ChangeNotifier {
 
   final GameRepository _repo;
 
-  final List<String> _icons = const [
+  List<String> _icons = const [
     'assets/card_skins/emoji_skin/e1.png',
     'assets/card_skins/emoji_skin/e2.png',
     'assets/card_skins/emoji_skin/e3.png',
@@ -33,6 +33,8 @@ class GameProvider extends ChangeNotifier {
     'assets/card_skins/emoji_skin/e18.png',
   ];
 
+  String backSkinAsset = 'assets/back_skins/default_skin.png';
+
   List<GameCardModel> cards = [];
   int rows = 4;
   int cols = 4;
@@ -50,11 +52,22 @@ class GameProvider extends ChangeNotifier {
   int? _firstIndex;
   Timer? _timer;
 
-  void startGame({required int rows, required int cols}) {
+  void startGame({
+    required int rows,
+    required int cols,
+    List<String>? icons,
+    String? backSkin,
+  }) {
     this.rows = rows;
     this.cols = cols;
     lastRows = rows;
     lastCols = cols;
+    if (icons != null && icons.isNotEmpty) {
+      _icons = icons;
+    }
+    if (backSkin != null && backSkin.isNotEmpty) {
+      backSkinAsset = backSkin;
+    }
     moves = 0;
     matches = 0;
     timeSeconds = 0;

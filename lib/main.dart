@@ -15,12 +15,15 @@ import 'screens/profile/profile_screen.dart';
 import 'screens/shop/shop_screen.dart';
 import 'screens/inventory/inventory_screen.dart';
 import 'screens/admin/admin_screen.dart';
+import 'screens/settings/settings_screen.dart';
 import 'services/auth_service.dart';
 import 'services/game_service.dart';
 import 'repositories/auth_repository.dart';
 import 'repositories/game_repository.dart';
 import 'providers/auth_provider.dart';
 import 'providers/game_provider.dart';
+import 'providers/skin_provider.dart';
+import 'providers/theme_provider.dart';
 
 void main() {
   runApp(const MindFlipApp());
@@ -41,20 +44,44 @@ class MindFlipApp extends StatelessWidget {
         ChangeNotifierProvider<GameProvider>(
           create: (context) => GameProvider(context.read<GameRepository>()),
         ),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'MindFlip',
-
-        theme: ThemeData(
-          primaryColor: const Color(0xFF6A5AE0),
-          scaffoldBackgroundColor: Colors.white,
-          fontFamily: 'Poppins',
+        ChangeNotifierProvider<SkinProvider>(
+          create: (_) => SkinProvider(),
         ),
+        ChangeNotifierProvider<ThemeProvider>(
+          create: (_) => ThemeProvider(),
+        ),
+      ],
+      child: Builder(
+        builder: (context) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'MindFlip',
 
-        initialRoute: '/',
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: const Color(0xFF6A5AE0),
+              ),
+              primaryColor: const Color(0xFF6A5AE0),
+              scaffoldBackgroundColor: Colors.white,
+              cardColor: Colors.white,
+              fontFamily: 'Poppins',
+            ),
+            darkTheme: ThemeData(
+              brightness: Brightness.dark,
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: const Color(0xFF6A5AE0),
+                brightness: Brightness.dark,
+              ),
+              primaryColor: const Color(0xFF6A5AE0),
+              scaffoldBackgroundColor: const Color(0xFF0F1115),
+              cardColor: const Color(0xFF1C1F26),
+              fontFamily: 'Poppins',
+            ),
+            themeMode: context.watch<ThemeProvider>().mode,
 
-        routes: {
+            initialRoute: '/',
+
+            routes: {
           '/': (context) => const SplashScreen(),
 
           '/login': (context) => const LoginScreen(),
@@ -72,6 +99,9 @@ class MindFlipApp extends StatelessWidget {
           '/shop': (context) => const ShopScreen(),
           '/inventory': (context) => const InventoryScreen(),
           '/admin': (context) => const AdminScreen(),
+          '/settings': (context) => const SettingsScreen(),
+        },
+          );
         },
       ),
     );

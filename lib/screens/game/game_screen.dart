@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 import 'package:provider/provider.dart';
 
 import '../../providers/game_provider.dart';
+import '../../providers/skin_provider.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({
@@ -19,21 +21,26 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   bool _navigated = false;
+  bool _ready = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context
-          .read<GameProvider>()
-          .startGame(rows: widget.rows, cols: widget.cols);
-    });
+    final skin = context.read<SkinProvider>();
+    context.read<GameProvider>().startGame(
+          rows: widget.rows,
+          cols: widget.cols,
+          icons: skin.currentFrontAssets,
+          backSkin: skin.currentBackAsset,
+        );
+    _ready = true;
   }
 
   void _checkFinish(GameProvider provider) {
+    if (!_ready) return;
     if (provider.gameOver && !_navigated) {
       _navigated = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 450), () {
         if (!mounted) return;
         Navigator.pushReplacementNamed(
           context,
@@ -72,13 +79,41 @@ class _GameScreenState extends State<GameScreen> {
                     _ScoreBar(score: provider.currentScore),
                     const SizedBox(height: 18),
                     Expanded(
-                      child: Center(
-                        child: _GameGrid(
-                          rows: provider.rows,
-                          cols: provider.cols,
-                          onTap: provider.flipCard,
-                          isLocked: provider.isBusy,
-                        ),
+                      child: Stack(
+                        children: [
+                          Center(
+                            child: _GameGrid(
+                              rows: provider.rows,
+                              cols: provider.cols,
+                              onTap: provider.flipCard,
+                              isLocked: provider.isBusy,
+                            ),
+                          ),
+                          AnimatedOpacity(
+                            duration: const Duration(milliseconds: 200),
+                            opacity: provider.gameOver ? 1 : 0,
+                            child: Center(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 18,
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xCC000000),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: const Text(
+                                  'Great job!',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -282,6 +317,7 @@ class _GameGrid extends StatelessWidget {
               isRevealed: card.isFaceUp || card.isMatched,
               isMatched: card.isMatched,
               assetPath: card.assetPath,
+              backSkin: provider.backSkinAsset,
             ),
           );
         },
@@ -295,46 +331,73 @@ class _GridTile extends StatelessWidget {
     required this.isRevealed,
     required this.isMatched,
     required this.assetPath,
+    required this.backSkin,
   });
 
   final bool isRevealed;
   final bool isMatched;
   final String assetPath;
+  final String backSkin;
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = isRevealed
-        ? Colors.white.withOpacity(0.85)
-        : Colors.white.withOpacity(0.15);
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 180),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isMatched ? const Color(0xFF37D07A) : Colors.transparent,
-          width: 1.2,
-        ),
-      ),
-      child: Center(
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          child: isRevealed
-              ? Image.asset(
-                  assetPath,
-                  width: 44,
-                  height: 44,
-                  fit: BoxFit.contain,
-                )
-              : ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: Image.asset(
-                    'assets/back_skins/default_skin.png',
-                    fit: BoxFit.cover,
-                  ),
-                ),
-        ),
-      ),
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: isRevealed ? 1 : 0),
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.easeInOut,
+      builder: (context, value, child) {
+        final angle = value * math.pi;
+        final showFront = value > 0.5;
+        final flip = Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.0015)
+            ..rotateY(angle),
+          child: Container(
+            decoration: BoxDecoration(
+              color: showFront
+                  ? Colors.white.withOpacity(0.85)
+                  : Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isMatched ? const Color(0xFF37D07A) : Colors.transparent,
+                width: 1.2,
+              ),
+            ),
+            child: Center(
+              child: showFront
+                  ? Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.rotationY(math.pi),
+                      child: Image.asset(
+                        assetPath,
+                        width: 44,
+                        height: 44,
+                        fit: BoxFit.contain,
+                      ),
+                    )
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: Image.asset(
+                        backSkin,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+            ),
+          ),
+        );
+
+        return TweenAnimationBuilder<double>(
+          tween: Tween<double>(begin: 0, end: isMatched ? 1 : 0),
+          duration: const Duration(milliseconds: 380),
+          curve: Curves.easeOut,
+          builder: (context, t, _) {
+            final scale =
+                isMatched ? 1.0 + 0.12 * math.sin(t * math.pi) : 1.0;
+            return Transform.scale(scale: scale, child: flip);
+          },
+        );
+      },
     );
   }
 }
