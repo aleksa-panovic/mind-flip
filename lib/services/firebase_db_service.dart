@@ -14,4 +14,12 @@ class FirebaseDbService {
   Stream<Map<String, dynamic>?> userStream(String uid) {
     return users().doc(uid).snapshots().map((d) => d.data());
   }
+
+  Stream<List<Map<String, dynamic>>> topLeaderboard({int limit = 50}) {
+    return results()
+        .orderBy('score', descending: true)
+        .limit(limit)
+        .snapshots()
+        .map((snap) => snap.docs.map((d) => d.data()).toList());
+  }
 }

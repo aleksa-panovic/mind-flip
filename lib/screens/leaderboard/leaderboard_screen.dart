@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../widgets/gradient_header.dart';
 import '../../widgets/fade_slide_in.dart';
+import '../../services/firebase_db_service.dart';
+import '../../providers/auth_provider.dart';
 
 class LeaderboardScreen extends StatelessWidget {
   const LeaderboardScreen({super.key});
@@ -13,20 +16,44 @@ class LeaderboardScreen extends StatelessWidget {
       body: Column(
         children: const [
           _Header(),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(20, 18, 20, 20),
-              child: Column(
-                children: [
-                  _TopThree(),
-                  SizedBox(height: 18),
-                  _LeaderboardList(),
-                ],
-              ),
-            ),
-          ),
+          Expanded(child: _LeaderboardBody()),
         ],
       ),
+    );
+  }
+}
+
+class _LeaderboardBody extends StatelessWidget {
+  const _LeaderboardBody();
+
+  @override
+  Widget build(BuildContext context) {
+    final db = FirebaseDbService();
+    final currentUser = context.watch<AuthProvider>().currentUser;
+    return StreamBuilder<List<Map<String, dynamic>>>(
+      stream: db.topLeaderboard(limit: 50),
+      builder: (context, snapshot) {
+        final data = snapshot.data ?? [];
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (data.isEmpty) {
+          return const Center(child: Text('No results yet.'));
+        }
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+          child: Column(
+            children: [
+              _TopThree(data: data.take(3).toList()),
+              const SizedBox(height: 18),
+              _LeaderboardList(
+                data: data.skip(3).toList(),
+                currentUserId: currentUser?.id,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -142,44 +169,51 @@ class _TabChip extends StatelessWidget {
 }
 
 class _TopThree extends StatelessWidget {
-  const _TopThree();
+  const _TopThree({required this.data});
+
+  final List<Map<String, dynamic>> data;
 
   @override
   Widget build(BuildContext context) {
+    final podium = [
+      if (data.length > 1) data[1] else null,
+      if (data.isNotEmpty) data[0] else null,
+      if (data.length > 2) data[2] else null,
+    ];
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const FadeSlideIn(
-          delay: Duration(milliseconds: 0),
+        FadeSlideIn(
+          delay: const Duration(milliseconds: 0),
           child: _PodiumCard(
             rank: 2,
-            name: 'GameQueen',
-            score: '2,340',
-            ringColor: Color(0xFFB9C1D9),
-            medalColor: Color(0xFFE3E6F2),
+            name: podium[0]?['username'] ?? '—',
+            score: (podium[0]?['score'] ?? 0).toString(),
+            ringColor: const Color(0xFFB9C1D9),
+            medalColor: const Color(0xFFE3E6F2),
             trophyAsset: 'assets/icons/second_place.png',
           ),
         ),
-        const FadeSlideIn(
-          delay: Duration(milliseconds: 80),
+        FadeSlideIn(
+          delay: const Duration(milliseconds: 80),
           child: _PodiumCard(
             rank: 1,
-            name: 'ProGamer99',
-            score: '2,450',
-            ringColor: Color(0xFFF2C94C),
-            medalColor: Color(0xFFF2C94C),
+            name: podium[1]?['username'] ?? '—',
+            score: (podium[1]?['score'] ?? 0).toString(),
+            ringColor: const Color(0xFFF2C94C),
+            medalColor: const Color(0xFFF2C94C),
             isWinner: true,
             trophyAsset: 'assets/icons/first_place.png',
           ),
         ),
-        const FadeSlideIn(
-          delay: Duration(milliseconds: 160),
+        FadeSlideIn(
+          delay: const Duration(milliseconds: 160),
           child: _PodiumCard(
             rank: 3,
-            name: 'MemoryKing',
-            score: '2,280',
-            ringColor: Color(0xFFFFA36C),
-            medalColor: Color(0xFFFFA36C),
+            name: podium[2]?['username'] ?? '—',
+            score: (podium[2]?['score'] ?? 0).toString(),
+            ringColor: const Color(0xFFFFA36C),
+            medalColor: const Color(0xFFFFA36C),
             trophyAsset: 'assets/icons/third_place.png',
           ),
         ),
@@ -261,63 +295,34 @@ class _PodiumCard extends StatelessWidget {
 }
 
 class _LeaderboardList extends StatelessWidget {
-  const _LeaderboardList();
+  const _LeaderboardList({required this.data, required this.currentUserId});
+
+  final List<Map<String, dynamic>> data;
+  final String? currentUserId;
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: const [
-        FadeSlideIn(
-          delay: Duration(milliseconds: 0),
-          child: _LeaderRow(
-            rank: 4,
-            name: 'FlipMaster',
-            score: 'Best: 2,150',
-            icon: Icons.sentiment_satisfied_alt,
+      children: List.generate(data.length, (index) {
+        final item = data[index];
+        final rank = index + 4;
+        final name = item['username'] ?? 'User';
+        final score = item['score']?.toString() ?? '0';
+        final isYou = item['userId'] == currentUserId;
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: FadeSlideIn(
+            delay: Duration(milliseconds: (index * 60).clamp(0, 360)),
+            child: _LeaderRow(
+              rank: rank,
+              name: name,
+              score: 'Best: $score',
+              icon: Icons.sentiment_satisfied_alt,
+              isYou: isYou,
+            ),
           ),
-        ),
-        SizedBox(height: 12),
-        FadeSlideIn(
-          delay: Duration(milliseconds: 80),
-          child: _LeaderRow(
-            rank: 5,
-            name: 'BrainWave',
-            score: 'Best: 2,080',
-            icon: Icons.psychology_alt,
-          ),
-        ),
-        SizedBox(height: 12),
-        FadeSlideIn(
-          delay: Duration(milliseconds: 160),
-          child: _LeaderRow(
-            rank: 42,
-            name: 'Alex_Pro',
-            score: 'Best: 1,850',
-            icon: Icons.sentiment_satisfied_alt,
-            isYou: true,
-          ),
-        ),
-        SizedBox(height: 12),
-        FadeSlideIn(
-          delay: Duration(milliseconds: 240),
-          child: _LeaderRow(
-            rank: 43,
-            name: 'CardShark',
-            score: 'Best: 1,820',
-            icon: Icons.catching_pokemon,
-          ),
-        ),
-        SizedBox(height: 12),
-        FadeSlideIn(
-          delay: Duration(milliseconds: 320),
-          child: _LeaderRow(
-            rank: 44,
-            name: 'QuickMind',
-            score: 'Best: 1,790',
-            icon: Icons.flash_on,
-          ),
-        ),
-      ],
+        );
+      }),
     );
   }
 }
