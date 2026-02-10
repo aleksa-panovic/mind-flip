@@ -58,6 +58,11 @@ class GameRepository {
       {
         'lastScore': result.score,
         'bestScore': nextBest,
+        'gamesPlayed': FieldValue.increment(1),
+        'totalScore': FieldValue.increment(result.score),
+        'totalTimeSeconds': FieldValue.increment(result.timeSeconds),
+        'totalMoves': FieldValue.increment(result.moves),
+        'totalCardsFlipped': FieldValue.increment(result.moves * 2),
         'updatedAt': FieldValue.serverTimestamp(),
       },
       SetOptions(merge: true),

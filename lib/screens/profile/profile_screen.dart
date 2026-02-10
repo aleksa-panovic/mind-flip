@@ -158,14 +158,18 @@ class _StatsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (context, auth, _) {
-        final bestScore = auth.currentUser?.bestScore ?? 0;
+        final user = auth.currentUser;
+        final bestScore = user?.bestScore ?? 0;
+        final gamesPlayed = user?.gamesPlayed ?? 0;
+        final avgScore =
+            gamesPlayed > 0 ? (user!.totalScore / gamesPlayed).round() : 0;
         return Row(
           children: [
-            const Expanded(
+            Expanded(
               child: _StatPill(
                 label: 'Games',
-                value: '0',
-                valueColor: Color(0xFF6A5AE0),
+                value: gamesPlayed.toString(),
+                valueColor: const Color(0xFF6A5AE0),
               ),
             ),
             const SizedBox(width: 12),
@@ -177,11 +181,11 @@ class _StatsRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            const Expanded(
+            Expanded(
               child: _StatPill(
-                label: 'Win Rate',
-                value: '0%',
-                valueColor: Color(0xFF37D07A),
+                label: 'Avg Score',
+                value: avgScore.toString(),
+                valueColor: const Color(0xFF37D07A),
               ),
             ),
           ],
@@ -250,6 +254,14 @@ class _StatsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cardColor = Theme.of(context).cardColor;
+    final user = context.watch<AuthProvider>().currentUser;
+    final totalSeconds = user?.totalTimeSeconds ?? 0;
+    final totalHours = totalSeconds ~/ 3600;
+    final totalMinutes = (totalSeconds % 3600) ~/ 60;
+    final avgScore = (user?.gamesPlayed ?? 0) > 0
+        ? (user!.totalScore / user.gamesPlayed).round()
+        : 0;
+    final cardsFlipped = user?.totalCardsFlipped ?? 0;
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
       decoration: BoxDecoration(
@@ -264,18 +276,21 @@ class _StatsCard extends StatelessWidget {
         ],
       ),
       child: Column(
-        children: const [
-          StatRow(label: 'Total Play Time', value: '0h 0m'),
-          SizedBox(height: 10),
-          StatRow(label: 'Average Score', value: '0'),
-          SizedBox(height: 10),
+        children: [
           StatRow(
+            label: 'Total Play Time',
+            value: '${totalHours}h ${totalMinutes}m',
+          ),
+          const SizedBox(height: 10),
+          StatRow(label: 'Average Score', value: avgScore.toString()),
+          const SizedBox(height: 10),
+          const StatRow(
             label: 'Longest Streak',
             value: '0 days',
             valueColor: Color(0xFF6A5AE0),
           ),
-          SizedBox(height: 10),
-          StatRow(label: 'Cards Flipped', value: '0'),
+          const SizedBox(height: 10),
+          StatRow(label: 'Cards Flipped', value: cardsFlipped.toString()),
         ],
       ),
     );
