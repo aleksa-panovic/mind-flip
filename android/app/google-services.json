@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "398513095158",
+    "project_id": "mind-flip-42dc6",
+    "storage_bucket": "mind-flip-42dc6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:398513095158:android:f3cbdd9b7d21dd5952c7d7",
+        "android_client_info": {
+          "package_name": "com.example.mind_flip"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoLHCiYVUFNmcWBa18KtUogFtHD-8cHmA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

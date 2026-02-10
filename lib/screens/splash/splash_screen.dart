@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/auth_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -37,7 +40,11 @@ class _SplashScreenState extends State<SplashScreen>
 
       if (progress >= 1) {
         t.cancel();
-        Navigator.pushReplacementNamed(context, '/home-guest');
+        final auth = context.read<AuthProvider>();
+        Navigator.pushReplacementNamed(
+          context,
+          auth.currentUser == null ? '/home-guest' : '/home-user',
+        );
       }
     });
   }

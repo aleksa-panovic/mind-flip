@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'screens/splash/splash_screen.dart';
 import 'screens/home/home_guest_screen.dart';
@@ -18,14 +19,19 @@ import 'screens/admin/admin_screen.dart';
 import 'screens/settings/settings_screen.dart';
 import 'services/auth_service.dart';
 import 'services/game_service.dart';
+import 'services/firebase_auth_service.dart';
+import 'services/firebase_db_service.dart';
 import 'repositories/auth_repository.dart';
 import 'repositories/game_repository.dart';
 import 'providers/auth_provider.dart';
 import 'providers/game_provider.dart';
 import 'providers/skin_provider.dart';
 import 'providers/theme_provider.dart';
+import 'models/user_model.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MindFlipApp());
 }
 
@@ -36,9 +42,28 @@ class MindFlipApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider<AuthRepository>(create: (_) => AuthRepository(AuthService())),
+        Provider<AuthRepository>(
+          create: (_) => AuthRepository(
+            AuthService(),
+            firebaseAuth: FirebaseAuthService(),
+            firebaseDb: FirebaseDbService(),
+          ),
+        ),
         ChangeNotifierProvider<AuthProvider>(
           create: (context) => AuthProvider(context.read<AuthRepository>()),
+        ),
+        StreamProvider<UserModel?>(
+          initialData: null,
+          create: (_) => FirebaseAuthService().authStateChanges.map(
+                (u) => u == null
+                    ? null
+                    : UserModel(
+                        id: u.uid,
+                        username: u.email?.split('@').first ?? 'User',
+                        email: u.email ?? '',
+                        role: UserRole.user,
+                      ),
+              ),
         ),
         Provider<GameRepository>(create: (_) => GameRepository(GameService())),
         ChangeNotifierProvider<GameProvider>(
@@ -53,6 +78,13 @@ class MindFlipApp extends StatelessWidget {
       ],
       child: Builder(
         builder: (context) {
+          final fbUser = context.watch<UserModel?>();
+          final auth = context.read<AuthProvider>();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (auth.currentUser?.id != fbUser?.id) {
+              auth.setUser(fbUser);
+            }
+          });
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'MindFlip',
@@ -82,25 +114,25 @@ class MindFlipApp extends StatelessWidget {
             initialRoute: '/',
 
             routes: {
-          '/': (context) => const SplashScreen(),
+              '/': (context) => const SplashScreen(),
 
-          '/login': (context) => const LoginScreen(),
+              '/login': (context) => const LoginScreen(),
 
-          '/register': (context) => const RegisterScreen(),
+              '/register': (context) => const RegisterScreen(),
 
-          '/home-guest': (context) => const HomeGuestScreen(),
-          '/home-user': (context) => const HomeUserScreen(),
-          '/game-4x4': (context) => const Game4x4Screen(),
-          '/game-5x6': (context) => const Game5x6Screen(),
-          '/game-6x6': (context) => const Game6x6Screen(),
-          '/result': (context) => const ResultScreen(),
-          '/leaderboard': (context) => const LeaderboardScreen(),
-          '/profile': (context) => const ProfileScreen(),
-          '/shop': (context) => const ShopScreen(),
-          '/inventory': (context) => const InventoryScreen(),
-          '/admin': (context) => const AdminScreen(),
-          '/settings': (context) => const SettingsScreen(),
-        },
+              '/home-guest': (context) => const HomeGuestScreen(),
+              '/home-user': (context) => const HomeUserScreen(),
+              '/game-4x4': (context) => const Game4x4Screen(),
+              '/game-5x6': (context) => const Game5x6Screen(),
+              '/game-6x6': (context) => const Game6x6Screen(),
+              '/result': (context) => const ResultScreen(),
+              '/leaderboard': (context) => const LeaderboardScreen(),
+              '/profile': (context) => const ProfileScreen(),
+              '/shop': (context) => const ShopScreen(),
+              '/inventory': (context) => const InventoryScreen(),
+              '/admin': (context) => const AdminScreen(),
+              '/settings': (context) => const SettingsScreen(),
+            },
           );
         },
       ),
