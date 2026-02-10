@@ -60,8 +60,11 @@ class MindFlipApp extends StatelessWidget {
           create: (_) => FirebaseAuthService().authStateChanges.asyncExpand(
                 (u) {
                   if (u == null) return Stream.value(null);
-                  return FirebaseDbService().userStream(u.uid).map((data) {
-                    if (data == null) return null;
+                  return FirebaseDbService().userStream(u.uid).asyncMap((data) async {
+                    if (data == null) {
+                      await FirebaseAuthService().logout();
+                      return null;
+                    }
                     final ownedFront =
                         _readStringList(data['ownedFrontSets'], const ['emoji']);
                     final ownedBack =

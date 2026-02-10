@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../providers/skin_provider.dart';
 import '../../widgets/fade_slide_in.dart';
+import '../../services/firebase_db_service.dart';
 
 class ShopScreen extends StatelessWidget {
   const ShopScreen({super.key});
@@ -133,48 +134,67 @@ class _SkinGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      crossAxisSpacing: 14,
-      mainAxisSpacing: 14,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      childAspectRatio: 0.85,
-      children: const [
-        FadeSlideIn(
-          delay: Duration(milliseconds: 0),
-          child: _SkinCard(
-            title: 'Animal',
-            priceLabel: '\$3.99',
-            cashPrice: 3.99,
-            assetPath: 'assets/card_skins/animal_skin/a1.png',
-            skinKey: 'animal',
-          ),
-        ),
-        FadeSlideIn(
-          delay: Duration(milliseconds: 80),
-          child: _SkinCard(
-            title: 'Space',
-            priceLabel: '\$5.99',
-            cashPrice: 5.99,
-            assetPath: 'assets/card_skins/space_skin/s1.png',
-            skinKey: 'space',
-          ),
-        ),
-        FadeSlideIn(
-          delay: Duration(milliseconds: 160),
-          child: _SkinCard(
-            title: 'Sport',
-            priceLabel: '\$4.99',
-            cashPrice: 4.99,
-            assetPath: 'assets/card_skins/sport_skin/Sp1.png',
-            skinKey: 'sport',
-          ),
-        ),
-      ],
+    return StreamBuilder(
+      stream: FirebaseDbService().shopItems().snapshots(),
+      builder: (context, snapshot) {
+        final docs = snapshot.data?.docs ?? [];
+        final frontItems = docs.where((d) {
+          final data = d.data();
+          final type = data['itemType']?.toString();
+          final currency = data['currency']?.toString();
+          if (type == null || type.isEmpty) {
+            return currency == 'usd';
+          }
+          return type == 'front_skin';
+        }).toList();
+        final items = frontItems.isEmpty
+            ? _fallbackFrontItems
+            : frontItems
+                .map((d) => d.data())
+                .toList(growable: false);
+        return GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 14,
+          mainAxisSpacing: 14,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          childAspectRatio: 0.85,
+          children: List.generate(items.length, (index) {
+            final data = items[index];
+            final key = data['itemKey']?.toString() ?? '';
+            final title = data['name']?.toString() ?? 'Skin';
+            final price = (data['price'] ?? 0).toString();
+            final priceLabel = '\$$price';
+            final assetPath = _frontSkinThumbs[key] ??
+                'assets/card_skins/emoji_skin/e1.png';
+            return FadeSlideIn(
+              delay: Duration(milliseconds: (index * 80).clamp(0, 240)),
+              child: _SkinCard(
+                title: title,
+                priceLabel: priceLabel,
+                cashPrice: double.tryParse(price) ?? 0,
+                assetPath: assetPath,
+                skinKey: key,
+              ),
+            );
+          }),
+        );
+      },
     );
   }
 }
+
+const List<Map<String, dynamic>> _fallbackFrontItems = [
+  {'itemKey': 'animal', 'name': 'Animal', 'price': 3.99},
+  {'itemKey': 'space', 'name': 'Space', 'price': 5.99},
+  {'itemKey': 'sport', 'name': 'Sport', 'price': 4.99},
+];
+
+const Map<String, String> _frontSkinThumbs = {
+  'animal': 'assets/card_skins/animal_skin/a1.png',
+  'space': 'assets/card_skins/space_skin/s1.png',
+  'sport': 'assets/card_skins/sport_skin/Sp1.png',
+};
 
 class _BackSkinGrid extends StatelessWidget {
   const _BackSkinGrid();

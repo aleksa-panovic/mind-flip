@@ -63,6 +63,7 @@ class GameRepository {
         'totalTimeSeconds': FieldValue.increment(result.timeSeconds),
         'totalMoves': FieldValue.increment(result.moves),
         'totalCardsFlipped': FieldValue.increment(result.moves * 2),
+        'diamonds': FieldValue.increment(result.coinsEarned),
         'updatedAt': FieldValue.serverTimestamp(),
       },
       SetOptions(merge: true),
