@@ -66,6 +66,7 @@ class AuthRepository {
         'username': username,
         'email': email,
         'role': 'user',
+        'diamonds': 100,
         'createdAt': FieldValue.serverTimestamp(),
       });
       return UserModel(
