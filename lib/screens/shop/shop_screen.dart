@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../providers/skin_provider.dart';
 import '../../widgets/fade_slide_in.dart';
 import '../../services/firebase_db_service.dart';
+import '../../providers/auth_provider.dart';
 
 class ShopScreen extends StatelessWidget {
   const ShopScreen({super.key});
@@ -63,6 +64,7 @@ Future<bool> _openStripeCheckout(BuildContext context, String skinKey) async {
   }
   return ok;
 }
+
 
 class _TitleBar extends StatelessWidget {
   const _TitleBar();
@@ -161,7 +163,8 @@ class _SkinGrid extends StatelessWidget {
           childAspectRatio: 0.85,
           children: List.generate(items.length, (index) {
             final data = items[index];
-            final key = data['itemKey']?.toString() ?? '';
+            final rawKey = data['itemKey']?.toString() ?? '';
+            final key = rawKey.toLowerCase().trim();
             final title = data['name']?.toString() ?? 'Skin';
             final price = (data['price'] ?? 0).toString();
             final priceLabel = '\$$price';
@@ -348,12 +351,22 @@ class _SkinCard extends StatelessWidget {
                 textColor: Colors.white,
                 onTap: () async {
                   if (owned) return;
+                  final isLoggedIn =
+                      context.read<AuthProvider>().currentUser != null;
+                  if (!isLoggedIn) {
+                    _showInfo(context, 'Moras biti ulogovan za kupovinu.');
+                    return;
+                  }
                   if (!isDiamond) {
                     final opened = await _openStripeCheckout(context, skinKey);
-                    if (opened) {
-                      await skin.buyFrontRemote(skinKey, cashPrice ?? 0);
-                      _showBought(context);
+                    if (!opened) return;
+                    final ok =
+                        await skin.buyFrontRemote(skinKey, cashPrice ?? 0);
+                    if (!ok) {
+                      _showInfo(context, 'Kupovina nije uspela.');
+                      return;
                     }
+                    _showBought(context);
                     return;
                   }
                   final ok = isBack

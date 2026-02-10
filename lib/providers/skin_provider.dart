@@ -121,18 +121,20 @@ class SkinProvider extends ChangeNotifier {
       backSkins[currentBackSkin] ?? backSkins['default']!;
 
   bool setFront(String key) {
-    if (!ownedFrontSets.contains(key)) return false;
-    if (currentFrontSet == key) return true;
-    currentFrontSet = key;
+    final normalized = key.toLowerCase();
+    if (!ownedFrontSets.contains(normalized)) return false;
+    if (currentFrontSet == normalized) return true;
+    currentFrontSet = normalized;
     _save();
     notifyListeners();
     return true;
   }
 
   bool setBack(String key) {
-    if (!ownedBackSkins.contains(key)) return false;
-    if (currentBackSkin == key) return true;
-    currentBackSkin = key;
+    final normalized = key.toLowerCase();
+    if (!ownedBackSkins.contains(normalized)) return false;
+    if (currentBackSkin == normalized) return true;
+    currentBackSkin = normalized;
     _save();
     notifyListeners();
     return true;
@@ -169,19 +171,21 @@ class SkinProvider extends ChangeNotifier {
   }
 
   bool buyFront(String key, int price) {
-    if (ownedFrontSets.contains(key)) return false;
+    final normalized = key.toLowerCase();
+    if (ownedFrontSets.contains(normalized)) return false;
     if (diamonds < price) return false;
     diamonds -= price;
-    ownedFrontSets.add(key);
+    ownedFrontSets.add(normalized);
     _save();
     notifyListeners();
     return true;
   }
 
   Future<bool> buyFrontRemote(String key, double price) async {
-    if (ownedFrontSets.contains(key)) return true;
+    final normalized = key.toLowerCase();
+    if (ownedFrontSets.contains(normalized)) return true;
     if (_firebaseDb == null || _firebaseAuth == null) {
-      ownedFrontSets.add(key);
+      ownedFrontSets.add(normalized);
       _save();
       notifyListeners();
       return true;
@@ -192,7 +196,7 @@ class SkinProvider extends ChangeNotifier {
     final purchaseRef = _firebaseDb!.purchases().doc();
     await userRef.set(
       {
-        'ownedFrontSets': FieldValue.arrayUnion([key]),
+        'ownedFrontSets': FieldValue.arrayUnion([normalized]),
         'updatedAt': FieldValue.serverTimestamp(),
       },
       SetOptions(merge: true),
@@ -200,33 +204,35 @@ class SkinProvider extends ChangeNotifier {
     await purchaseRef.set({
       'userId': user.uid,
       'itemType': 'front_skin',
-      'itemKey': key,
+      'itemKey': normalized,
       'price': price,
       'currency': 'usd',
       'createdAt': FieldValue.serverTimestamp(),
     });
-    ownedFrontSets.add(key);
+    ownedFrontSets.add(normalized);
     notifyListeners();
     return true;
   }
 
   bool buyBack(String key, int price) {
-    if (ownedBackSkins.contains(key)) return false;
+    final normalized = key.toLowerCase();
+    if (ownedBackSkins.contains(normalized)) return false;
     if (diamonds < price) return false;
     diamonds -= price;
-    ownedBackSkins.add(key);
+    ownedBackSkins.add(normalized);
     _save();
     notifyListeners();
     return true;
   }
 
   Future<bool> buyBackRemote(String key, int price) async {
+    final normalized = key.toLowerCase();
     if (_firebaseDb == null || _firebaseAuth == null) {
-      return buyBack(key, price);
+      return buyBack(normalized, price);
     }
     final user = _firebaseAuth!.currentUser;
     if (user == null) return false;
-    if (ownedBackSkins.contains(key)) return true;
+    if (ownedBackSkins.contains(normalized)) return true;
     final userRef = _firebaseDb!.users().doc(user.uid);
     final purchaseRef = _firebaseDb!.purchases().doc();
     try {
@@ -235,7 +241,7 @@ class SkinProvider extends ChangeNotifier {
         final data = snap.data() ?? <String, dynamic>{};
         final current = _readInt(data['diamonds'], 0);
         final owned = _readList(data['ownedBackSkins'], const <String>[]);
-        if (owned.contains(key)) return;
+        if (owned.contains(normalized)) return;
         if (current < price) {
           throw StateError('not-enough');
         }
@@ -243,7 +249,7 @@ class SkinProvider extends ChangeNotifier {
           userRef,
           {
             'diamonds': current - price,
-            'ownedBackSkins': FieldValue.arrayUnion([key]),
+            'ownedBackSkins': FieldValue.arrayUnion([normalized]),
             'updatedAt': FieldValue.serverTimestamp(),
           },
           SetOptions(merge: true),
@@ -253,7 +259,7 @@ class SkinProvider extends ChangeNotifier {
           {
             'userId': user.uid,
             'itemType': 'back_skin',
-            'itemKey': key,
+            'itemKey': normalized,
             'price': price,
             'currency': 'diamonds',
             'createdAt': FieldValue.serverTimestamp(),
@@ -261,7 +267,7 @@ class SkinProvider extends ChangeNotifier {
         );
       });
       diamonds = (diamonds - price).clamp(0, 1 << 31).toInt();
-      ownedBackSkins.add(key);
+      ownedBackSkins.add(normalized);
       notifyListeners();
       return true;
     } on StateError {
@@ -308,14 +314,14 @@ class SkinProvider extends ChangeNotifier {
 
   void syncFromUser(UserModel user) {
     diamonds = user.diamonds;
-    currentFrontSet = user.currentFrontSet;
-    currentBackSkin = user.currentBackSkin;
+    currentFrontSet = user.currentFrontSet.toLowerCase();
+    currentBackSkin = user.currentBackSkin.toLowerCase();
     ownedFrontSets
       ..clear()
-      ..addAll(user.ownedFrontSets);
+      ..addAll(user.ownedFrontSets.map((e) => e.toLowerCase()));
     ownedBackSkins
       ..clear()
-      ..addAll(user.ownedBackSkins);
+      ..addAll(user.ownedBackSkins.map((e) => e.toLowerCase()));
     _save();
     notifyListeners();
   }
