@@ -13,11 +13,17 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
+  final _resetEmailCtrl = TextEditingController();
+  final _resetPassCtrl = TextEditingController();
+  final _resetConfirmCtrl = TextEditingController();
 
   @override
   void dispose() {
     _emailCtrl.dispose();
     _passCtrl.dispose();
+    _resetEmailCtrl.dispose();
+    _resetPassCtrl.dispose();
+    _resetConfirmCtrl.dispose();
     super.dispose();
   }
 
@@ -42,6 +48,86 @@ class _LoginScreenState extends State<LoginScreen> {
       final msg = context.read<AuthProvider>().errorMessage ?? 'Login error';
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
     }
+  }
+
+  Future<void> _openResetDialog() async {
+    _resetEmailCtrl.text = _emailCtrl.text.trim();
+    _resetPassCtrl.clear();
+    _resetConfirmCtrl.clear();
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Reset Password'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _InputField(
+                hintText: 'your@email.com',
+                obscureText: false,
+                controller: _resetEmailCtrl,
+              ),
+              const SizedBox(height: 10),
+              _InputField(
+                hintText: 'New password',
+                obscureText: true,
+                controller: _resetPassCtrl,
+              ),
+              const SizedBox(height: 10),
+              _InputField(
+                hintText: 'Confirm password',
+                obscureText: true,
+                controller: _resetConfirmCtrl,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final email = _resetEmailCtrl.text.trim();
+                final pass = _resetPassCtrl.text;
+                final confirm = _resetConfirmCtrl.text;
+                if (email.isEmpty || !email.contains('@')) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Unesi validan email.')),
+                  );
+                  return;
+                }
+                if (pass.isEmpty || confirm.isEmpty || pass != confirm) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Lozinke se ne poklapaju.')),
+                  );
+                  return;
+                }
+                final ok =
+                    await context.read<AuthProvider>().sendPasswordReset(email);
+                if (!mounted) return;
+                if (ok) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Poslat je reset link na email. Potvrdi promenu.',
+                      ),
+                    ),
+                  );
+                } else {
+                  final msg =
+                      context.read<AuthProvider>().errorMessage ?? 'Reset error';
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(msg)));
+                }
+              },
+              child: const Text('Reset'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -150,7 +236,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: _openResetDialog,
                         style: TextButton.styleFrom(
                           padding: EdgeInsets.zero,
                           foregroundColor: const Color(0xFF7C4DFF),

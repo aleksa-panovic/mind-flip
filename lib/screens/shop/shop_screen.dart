@@ -305,10 +305,14 @@ class _SkinCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             child: Center(
-              child: assetPath != null
-                  ? Image.asset(assetPath!, width: 52, height: 52)
-                  : Icon(icon, color: const Color(0xFF6A5AE0), size: 34),
-            ),
+            child: assetPath != null
+                ? Image.asset(
+                    assetPath!,
+                    width: assetPath!.contains('sport_skin') ? 62 : 52,
+                    height: assetPath!.contains('sport_skin') ? 62 : 52,
+                  )
+                : Icon(icon, color: const Color(0xFF6A5AE0), size: 34),
+          ),
           ),
           const SizedBox(height: 10),
           Text(

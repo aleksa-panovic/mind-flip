@@ -71,6 +71,25 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<bool> sendPasswordReset(String email) async {
+    isLoading = true;
+    errorMessage = null;
+    notifyListeners();
+    try {
+      await _repo.sendPasswordReset(email);
+      return true;
+    } on FirebaseAuthException catch (e) {
+      errorMessage = _mapAuthError(e);
+      return false;
+    } catch (e) {
+      errorMessage = 'Reset failed. Try again.';
+      return false;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
   void setUser(UserModel? user) {
     currentUser = user;
     notifyListeners();

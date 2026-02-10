@@ -58,4 +58,8 @@ class AuthService {
     // TODO(KT3): replace with real backend call.
     await Future.delayed(const Duration(milliseconds: 150));
   }
+
+  Future<void> sendPasswordReset(String email) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+  }
 }

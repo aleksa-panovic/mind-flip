@@ -137,6 +137,11 @@ class AuthRepository {
     return _firebaseAuth!.logout();
   }
 
+  Future<void> sendPasswordReset(String email) {
+    if (_firebaseAuth == null) return _service.sendPasswordReset(email);
+    return _firebaseAuth!.sendPasswordReset(email);
+  }
+
   UserRole _parseRole(dynamic role) {
     if (role == 'admin') return UserRole.admin;
     if (role == 'guest') return UserRole.guest;
