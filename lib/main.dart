@@ -72,7 +72,13 @@ class MindFlipApp extends StatelessWidget {
                 },
               ),
         ),
-        Provider<GameRepository>(create: (_) => GameRepository(GameService())),
+        Provider<GameRepository>(
+          create: (_) => GameRepository(
+            GameService(),
+            firebaseDb: FirebaseDbService(),
+            firebaseAuth: FirebaseAuthService(),
+          ),
+        ),
         ChangeNotifierProvider<GameProvider>(
           create: (context) => GameProvider(context.read<GameRepository>()),
         ),

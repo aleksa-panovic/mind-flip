@@ -1,10 +1,20 @@
 import '../models/game_result.dart';
 import '../services/game_service.dart';
+import '../services/firebase_db_service.dart';
+import '../services/firebase_auth_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class GameRepository {
-  GameRepository(this._service);
+  GameRepository(
+    this._service, {
+    FirebaseDbService? firebaseDb,
+    FirebaseAuthService? firebaseAuth,
+  })  : _firebaseDb = firebaseDb,
+        _firebaseAuth = firebaseAuth;
 
   final GameService _service;
+  final FirebaseDbService? _firebaseDb;
+  final FirebaseAuthService? _firebaseAuth;
 
   GameResult buildResult({
     required int timeSeconds,
@@ -21,7 +31,34 @@ class GameRepository {
   }
 
   Future<void> saveResult(GameResult result) async {
-    // TODO(KT3): send result to backend.
-    await Future.delayed(const Duration(milliseconds: 200));
+    if (_firebaseDb == null || _firebaseAuth == null) {
+      await Future.delayed(const Duration(milliseconds: 200));
+      return;
+    }
+    final user = _firebaseAuth!.currentUser;
+    if (user == null) return;
+    final uid = user.uid;
+    final data = {
+      'userId': uid,
+      'score': result.score,
+      'timeSeconds': result.timeSeconds,
+      'moves': result.moves,
+      'bestCombo': result.bestCombo,
+      'diamondsEarned': result.coinsEarned,
+      'createdAt': FieldValue.serverTimestamp(),
+    };
+    await _firebaseDb!.results().add(data);
+    final userRef = _firebaseDb!.users().doc(uid);
+    final snap = await userRef.get();
+    final currentBest = (snap.data()?['bestScore'] ?? 0) as int;
+    final nextBest = result.score > currentBest ? result.score : currentBest;
+    await userRef.set(
+      {
+        'lastScore': result.score,
+        'bestScore': nextBest,
+        'updatedAt': FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    );
   }
 }
