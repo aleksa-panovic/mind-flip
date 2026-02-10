@@ -10,4 +10,8 @@ class FirebaseDbService {
       _db.collection('shop_items');
   CollectionReference<Map<String, dynamic>> purchases() =>
       _db.collection('purchases');
+
+  Stream<Map<String, dynamic>?> userStream(String uid) {
+    return users().doc(uid).snapshots().map((d) => d.data());
+  }
 }

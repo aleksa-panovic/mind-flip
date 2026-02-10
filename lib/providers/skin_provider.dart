@@ -153,6 +153,12 @@ class SkinProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setDiamonds(int value) {
+    diamonds = value;
+    _save();
+    notifyListeners();
+  }
+
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     diamonds = prefs.getInt('diamonds') ?? 2450;

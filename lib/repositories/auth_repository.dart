@@ -34,6 +34,7 @@ class AuthRepository {
           id: uid,
           username: data['username'] ?? 'User',
           email: data['email'] ?? email,
+          diamonds: (data['diamonds'] ?? 0) as int,
           role: _parseRole(data['role']),
         );
       }
@@ -41,6 +42,7 @@ class AuthRepository {
         id: uid,
         username: email.split('@').first,
         email: email,
+        diamonds: 0,
         role: UserRole.user,
       );
     });
@@ -73,6 +75,7 @@ class AuthRepository {
         id: uid,
         username: username,
         email: email,
+        diamonds: 100,
         role: UserRole.user,
       );
     });

@@ -54,15 +54,22 @@ class MindFlipApp extends StatelessWidget {
         ),
         StreamProvider<UserModel?>(
           initialData: null,
-          create: (_) => FirebaseAuthService().authStateChanges.map(
-                (u) => u == null
-                    ? null
-                    : UserModel(
-                        id: u.uid,
-                        username: u.email?.split('@').first ?? 'User',
-                        email: u.email ?? '',
-                        role: UserRole.user,
-                      ),
+          create: (_) => FirebaseAuthService().authStateChanges.asyncExpand(
+                (u) {
+                  if (u == null) return Stream.value(null);
+                  return FirebaseDbService().userStream(u.uid).map((data) {
+                    if (data == null) return null;
+                    return UserModel(
+                      id: u.uid,
+                      username: data['username'] ?? 'User',
+                      email: data['email'] ?? '',
+                      diamonds: (data['diamonds'] ?? 0) as int,
+                      role: data['role'] == 'admin'
+                          ? UserRole.admin
+                          : UserRole.user,
+                    );
+                  });
+                },
               ),
         ),
         Provider<GameRepository>(create: (_) => GameRepository(GameService())),
@@ -80,9 +87,13 @@ class MindFlipApp extends StatelessWidget {
         builder: (context) {
           final fbUser = context.watch<UserModel?>();
           final auth = context.read<AuthProvider>();
+          final skin = context.read<SkinProvider>();
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (auth.currentUser?.id != fbUser?.id) {
               auth.setUser(fbUser);
+            }
+            if (fbUser != null) {
+              skin.setDiamonds(fbUser.diamonds);
             }
           });
           return MaterialApp(
