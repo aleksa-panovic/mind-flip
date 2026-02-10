@@ -22,4 +22,16 @@ class FirebaseDbService {
         .snapshots()
         .map((snap) => snap.docs.map((d) => d.data()).toList());
   }
+
+  Stream<List<Map<String, dynamic>>> purchasesForUser(
+    String userId, {
+    int limit = 10,
+  }) {
+    return purchases()
+        .where('userId', isEqualTo: userId)
+        .orderBy('createdAt', descending: true)
+        .limit(limit)
+        .snapshots()
+        .map((snap) => snap.docs.map((d) => d.data()).toList());
+  }
 }

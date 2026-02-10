@@ -178,6 +178,38 @@ class SkinProvider extends ChangeNotifier {
     return true;
   }
 
+  Future<bool> buyFrontRemote(String key, double price) async {
+    if (ownedFrontSets.contains(key)) return true;
+    if (_firebaseDb == null || _firebaseAuth == null) {
+      ownedFrontSets.add(key);
+      _save();
+      notifyListeners();
+      return true;
+    }
+    final user = _firebaseAuth!.currentUser;
+    if (user == null) return false;
+    final userRef = _firebaseDb!.users().doc(user.uid);
+    final purchaseRef = _firebaseDb!.purchases().doc();
+    await userRef.set(
+      {
+        'ownedFrontSets': FieldValue.arrayUnion([key]),
+        'updatedAt': FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    );
+    await purchaseRef.set({
+      'userId': user.uid,
+      'itemType': 'front_skin',
+      'itemKey': key,
+      'price': price,
+      'currency': 'usd',
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+    ownedFrontSets.add(key);
+    notifyListeners();
+    return true;
+  }
+
   bool buyBack(String key, int price) {
     if (ownedBackSkins.contains(key)) return false;
     if (diamonds < price) return false;
@@ -196,6 +228,7 @@ class SkinProvider extends ChangeNotifier {
     if (user == null) return false;
     if (ownedBackSkins.contains(key)) return true;
     final userRef = _firebaseDb!.users().doc(user.uid);
+    final purchaseRef = _firebaseDb!.purchases().doc();
     try {
       await FirebaseFirestore.instance.runTransaction((tx) async {
         final snap = await tx.get(userRef);
@@ -214,6 +247,17 @@ class SkinProvider extends ChangeNotifier {
             'updatedAt': FieldValue.serverTimestamp(),
           },
           SetOptions(merge: true),
+        );
+        tx.set(
+          purchaseRef,
+          {
+            'userId': user.uid,
+            'itemType': 'back_skin',
+            'itemKey': key,
+            'price': price,
+            'currency': 'diamonds',
+            'createdAt': FieldValue.serverTimestamp(),
+          },
         );
       });
       diamonds = (diamonds - price).clamp(0, 1 << 31).toInt();

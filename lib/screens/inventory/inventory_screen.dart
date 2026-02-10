@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import '../../providers/skin_provider.dart';
 import '../../widgets/gradient_header.dart';
 import '../../widgets/fade_slide_in.dart';
+import '../../services/firebase_db_service.dart';
+import '../../providers/auth_provider.dart';
 
 class InventoryScreen extends StatelessWidget {
   const InventoryScreen({super.key});
@@ -35,6 +37,13 @@ class InventoryScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 12),
                   _BackSkinGrid(),
+                  SizedBox(height: 22),
+                  _SectionHeader(
+                    title: 'Purchase History',
+                    action: '',
+                  ),
+                  SizedBox(height: 12),
+                  _PurchaseHistory(),
                 ],
               ),
             ),
@@ -371,6 +380,96 @@ class _BackSkinGrid extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+class _PurchaseHistory extends StatelessWidget {
+  const _PurchaseHistory();
+
+  @override
+  Widget build(BuildContext context) {
+    final userId = context.watch<AuthProvider>().currentUser?.id;
+    if (userId == null) {
+      return const Text('Log in to see purchase history.');
+    }
+    return StreamBuilder<List<Map<String, dynamic>>>(
+      stream: FirebaseDbService().purchasesForUser(userId, limit: 10),
+      builder: (context, snapshot) {
+        final items = snapshot.data ?? [];
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (items.isEmpty) {
+          return const Text('No purchases yet.');
+        }
+        return Column(
+          children: items.map((item) {
+            final type = item['itemType']?.toString() ?? '';
+            final key = item['itemKey']?.toString() ?? '';
+            final price = item['price']?.toString() ?? '';
+            final currency = item['currency']?.toString() ?? '';
+            final label = type == 'back_skin'
+                ? 'Back Skin'
+                : type == 'front_skin'
+                    ? 'Card Skin'
+                    : 'Item';
+            return Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x11000000),
+                    blurRadius: 12,
+                    offset: Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF2EAFE),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.shopping_bag_outlined,
+                        color: Color(0xFF6A5AE0), size: 20),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '$label: ${key.toUpperCase()}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Price: $price $currency',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        );
+      },
     );
   }
 }

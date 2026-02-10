@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../providers/skin_provider.dart';
 import '../../widgets/fade_slide_in.dart';
@@ -32,6 +33,34 @@ class ShopScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+const Map<String, String> _stripePaymentLinks = {
+  // TODO: Replace with your Stripe test Payment Links.
+  'animal': 'https://buy.stripe.com/test_7sY9AS9mc5jJdxC5NQffy00',
+  'space': 'https://buy.stripe.com/test_00wfZgeGw5jJalq0twffy02',
+  'sport': 'https://buy.stripe.com/test_6oUbJ01TK6nNfFKa46ffy01',
+};
+
+Future<bool> _openStripeCheckout(BuildContext context, String skinKey) async {
+  final url = _stripePaymentLinks[skinKey];
+  if (url == null || url.contains('test_replace')) {
+    _showInfo(
+      context,
+      'Stripe link nije postavljen. Dodaj Payment Link u kod.',
+    );
+    return false;
+  }
+  final uri = Uri.tryParse(url);
+  if (uri == null) {
+    _showInfo(context, 'Nevalidan Stripe link.');
+    return false;
+  }
+  final ok = await launchUrl(uri, mode: LaunchMode.platformDefault);
+  if (!ok) {
+    _showInfo(context, 'Ne mogu da otvorim Stripe checkout.');
+  }
+  return ok;
 }
 
 class _TitleBar extends StatelessWidget {
@@ -117,6 +146,7 @@ class _SkinGrid extends StatelessWidget {
           child: _SkinCard(
             title: 'Animal',
             priceLabel: '\$3.99',
+            cashPrice: 3.99,
             assetPath: 'assets/card_skins/animal_skin/a1.png',
             skinKey: 'animal',
           ),
@@ -126,6 +156,7 @@ class _SkinGrid extends StatelessWidget {
           child: _SkinCard(
             title: 'Space',
             priceLabel: '\$5.99',
+            cashPrice: 5.99,
             assetPath: 'assets/card_skins/space_skin/s1.png',
             skinKey: 'space',
           ),
@@ -135,6 +166,7 @@ class _SkinGrid extends StatelessWidget {
           child: _SkinCard(
             title: 'Sport',
             priceLabel: '\$4.99',
+            cashPrice: 4.99,
             assetPath: 'assets/card_skins/sport_skin/Sp1.png',
             skinKey: 'sport',
           ),
@@ -202,6 +234,7 @@ class _SkinCard extends StatelessWidget {
   const _SkinCard({
     required this.title,
     this.priceLabel,
+    this.cashPrice,
     this.diamondPrice,
     this.icon,
     this.assetPath,
@@ -212,6 +245,7 @@ class _SkinCard extends StatelessWidget {
 
   final String title;
   final String? priceLabel;
+  final double? cashPrice;
   final int? diamondPrice;
   final IconData? icon;
   final String? assetPath;
@@ -291,7 +325,11 @@ class _SkinCard extends StatelessWidget {
                 onTap: () async {
                   if (owned) return;
                   if (!isDiamond) {
-                    _showInfo(context, 'Card skins will be purchasable later.');
+                    final opened = await _openStripeCheckout(context, skinKey);
+                    if (opened) {
+                      await skin.buyFrontRemote(skinKey, cashPrice ?? 0);
+                      _showBought(context);
+                    }
                     return;
                   }
                   final ok = isBack
