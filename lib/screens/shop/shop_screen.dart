@@ -288,14 +288,14 @@ class _SkinCard extends StatelessWidget {
                 label: owned ? 'Owned' : 'Buy',
                 color: owned ? const Color(0xFFB8B6C9) : const Color(0xFF3BD27A),
                 textColor: Colors.white,
-                onTap: () {
+                onTap: () async {
                   if (owned) return;
                   if (!isDiamond) {
                     _showInfo(context, 'Card skins will be purchasable later.');
                     return;
                   }
                   final ok = isBack
-                      ? skin.buyBack(skinKey, diamondPrice ?? 0)
+                      ? await skin.buyBackRemote(skinKey, diamondPrice ?? 0)
                       : skin.buyFront(skinKey, diamondPrice ?? 0);
                   if (!ok) {
                     _showNotEnoughDiamonds(context);

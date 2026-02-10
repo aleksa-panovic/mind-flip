@@ -40,6 +40,8 @@ class _LeaderboardBody extends StatelessWidget {
         if (data.isEmpty) {
           return const Center(child: Text('No results yet.'));
         }
+        final currentIndex =
+            data.indexWhere((e) => e['userId'] == currentUser?.id);
         return SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
           child: Column(
@@ -49,6 +51,14 @@ class _LeaderboardBody extends StatelessWidget {
               _LeaderboardList(
                 data: data.skip(3).toList(),
                 currentUserId: currentUser?.id,
+              ),
+              const SizedBox(height: 18),
+              _YourRankCard(
+                rank: currentIndex >= 0 ? currentIndex + 1 : null,
+                name: currentUser?.username ?? 'You',
+                score: currentIndex >= 0
+                    ? (data[currentIndex]['score'] ?? 0).toString()
+                    : (currentUser?.bestScore ?? 0).toString(),
               ),
             ],
           ),
@@ -187,7 +197,7 @@ class _TopThree extends StatelessWidget {
           delay: const Duration(milliseconds: 0),
           child: _PodiumCard(
             rank: 2,
-            name: podium[0]?['username'] ?? '—',
+            name: podium[0]?['username'] ?? '-',
             score: (podium[0]?['score'] ?? 0).toString(),
             ringColor: const Color(0xFFB9C1D9),
             medalColor: const Color(0xFFE3E6F2),
@@ -198,7 +208,7 @@ class _TopThree extends StatelessWidget {
           delay: const Duration(milliseconds: 80),
           child: _PodiumCard(
             rank: 1,
-            name: podium[1]?['username'] ?? '—',
+            name: podium[1]?['username'] ?? '-',
             score: (podium[1]?['score'] ?? 0).toString(),
             ringColor: const Color(0xFFF2C94C),
             medalColor: const Color(0xFFF2C94C),
@@ -210,7 +220,7 @@ class _TopThree extends StatelessWidget {
           delay: const Duration(milliseconds: 160),
           child: _PodiumCard(
             rank: 3,
-            name: podium[2]?['username'] ?? '—',
+            name: podium[2]?['username'] ?? '-',
             score: (podium[2]?['score'] ?? 0).toString(),
             ringColor: const Color(0xFFFFA36C),
             medalColor: const Color(0xFFFFA36C),
@@ -323,6 +333,82 @@ class _LeaderboardList extends StatelessWidget {
           ),
         );
       }),
+    );
+  }
+}
+
+class _YourRankCard extends StatelessWidget {
+  const _YourRankCard({
+    required this.rank,
+    required this.name,
+    required this.score,
+  });
+
+  final int? rank;
+  final String name;
+  final String score;
+
+  @override
+  Widget build(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF2EAFE),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFB08CFF), width: 1.2),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x11000000),
+            blurRadius: 14,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Icon(Icons.person, color: Color(0xFF6A5AE0)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: TextStyle(
+                    color: onSurface,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Best: $score',
+                  style: TextStyle(
+                    color: onSurface.withOpacity(0.6),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            rank != null ? '#$rank' : 'Unranked',
+            style: const TextStyle(
+              color: Color(0xFF6A5AE0),
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

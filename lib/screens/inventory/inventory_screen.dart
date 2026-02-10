@@ -193,7 +193,7 @@ class _CardSkinGrid extends StatelessWidget {
               title: 'Emoji (Default)',
               assetPath: 'assets/card_skins/emoji_skin/e1.png',
               isSelected: skin.currentFrontSet == 'emoji',
-              onTap: () => skin.setFront('emoji'),
+              onTap: () => skin.setFrontRemote('emoji'),
             ),
           ),
         if (skin.ownedFrontSets.contains('animal'))
@@ -203,7 +203,7 @@ class _CardSkinGrid extends StatelessWidget {
               title: 'Animal',
               assetPath: 'assets/card_skins/animal_skin/a1.png',
               isSelected: skin.currentFrontSet == 'animal',
-              onTap: () => skin.setFront('animal'),
+              onTap: () => skin.setFrontRemote('animal'),
             ),
           ),
         if (skin.ownedFrontSets.contains('space'))
@@ -213,7 +213,7 @@ class _CardSkinGrid extends StatelessWidget {
               title: 'Space',
               assetPath: 'assets/card_skins/space_skin/s1.png',
               isSelected: skin.currentFrontSet == 'space',
-              onTap: () => skin.setFront('space'),
+              onTap: () => skin.setFrontRemote('space'),
             ),
           ),
         if (skin.ownedFrontSets.contains('sport'))
@@ -223,7 +223,7 @@ class _CardSkinGrid extends StatelessWidget {
               title: 'Sport',
               assetPath: 'assets/card_skins/sport_skin/Sp1.png',
               isSelected: skin.currentFrontSet == 'sport',
-              onTap: () => skin.setFront('sport'),
+              onTap: () => skin.setFrontRemote('sport'),
             ),
           ),
       ],
@@ -337,7 +337,7 @@ class _BackSkinGrid extends StatelessWidget {
               title: 'Default',
               assetPath: 'assets/back_skins/default_skin.png',
               isEquipped: skin.currentBackSkin == 'default',
-              onTap: () => skin.setBack('default'),
+              onTap: () => skin.setBackRemote('default'),
             ),
           ),
         if (skin.ownedBackSkins.contains('galaxy'))
@@ -347,7 +347,7 @@ class _BackSkinGrid extends StatelessWidget {
               title: 'Galaxy',
               assetPath: 'assets/back_skins/galaxy_skin.png',
               isEquipped: skin.currentBackSkin == 'galaxy',
-              onTap: () => skin.setBack('galaxy'),
+              onTap: () => skin.setBackRemote('galaxy'),
             ),
           ),
         if (skin.ownedBackSkins.contains('nature'))
@@ -357,7 +357,7 @@ class _BackSkinGrid extends StatelessWidget {
               title: 'Nature',
               assetPath: 'assets/back_skins/nature skin.png',
               isEquipped: skin.currentBackSkin == 'nature',
-              onTap: () => skin.setBack('nature'),
+              onTap: () => skin.setBackRemote('nature'),
             ),
           ),
         if (skin.ownedBackSkins.contains('lava'))
@@ -367,7 +367,7 @@ class _BackSkinGrid extends StatelessWidget {
               title: 'Lava',
               assetPath: 'assets/back_skins/lava_skin.png',
               isEquipped: skin.currentBackSkin == 'lava',
-              onTap: () => skin.setBack('lava'),
+              onTap: () => skin.setBackRemote('lava'),
             ),
           ),
       ],

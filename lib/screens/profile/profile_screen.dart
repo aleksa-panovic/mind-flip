@@ -156,32 +156,37 @@ class _StatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: const [
-        Expanded(
-          child: _StatPill(
-            label: 'Games',
-            value: '156',
-            valueColor: Color(0xFF6A5AE0),
-          ),
-        ),
-        SizedBox(width: 12),
-        Expanded(
-          child: _StatPill(
-            label: 'Best Score',
-            value: '1,850',
-            valueColor: Color(0xFF2CCCE6),
-          ),
-        ),
-        SizedBox(width: 12),
-        Expanded(
-          child: _StatPill(
-            label: 'Win Rate',
-            value: '87%',
-            valueColor: Color(0xFF37D07A),
-          ),
-        ),
-      ],
+    return Consumer<AuthProvider>(
+      builder: (context, auth, _) {
+        final bestScore = auth.currentUser?.bestScore ?? 0;
+        return Row(
+          children: [
+            const Expanded(
+              child: _StatPill(
+                label: 'Games',
+                value: '0',
+                valueColor: Color(0xFF6A5AE0),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _StatPill(
+                label: 'Best Score',
+                value: bestScore.toString(),
+                valueColor: const Color(0xFF2CCCE6),
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: _StatPill(
+                label: 'Win Rate',
+                value: '0%',
+                valueColor: Color(0xFF37D07A),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -260,17 +265,17 @@ class _StatsCard extends StatelessWidget {
       ),
       child: Column(
         children: const [
-          StatRow(label: 'Total Play Time', value: '24h 35m'),
+          StatRow(label: 'Total Play Time', value: '0h 0m'),
           SizedBox(height: 10),
-          StatRow(label: 'Average Score', value: '1,420'),
+          StatRow(label: 'Average Score', value: '0'),
           SizedBox(height: 10),
           StatRow(
             label: 'Longest Streak',
-            value: '12 days',
+            value: '0 days',
             valueColor: Color(0xFF6A5AE0),
           ),
           SizedBox(height: 10),
-          StatRow(label: 'Cards Flipped', value: '8,542'),
+          StatRow(label: 'Cards Flipped', value: '0'),
         ],
       ),
     );

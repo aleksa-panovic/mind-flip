@@ -30,11 +30,24 @@ class AuthRepository {
       final snap = await _firebaseDb!.users().doc(uid).get();
       if (snap.exists) {
         final data = snap.data()!;
+        final ownedFront =
+            _readList(data['ownedFrontSets'], const ['emoji']);
+        final ownedBack = _readList(data['ownedBackSkins'], const ['default']);
+        final currentFront =
+            _readString(data['currentFrontSet'], 'emoji');
+        final currentBack =
+            _readString(data['currentBackSkin'], 'default');
         return UserModel(
           id: uid,
           username: data['username'] ?? 'User',
           email: data['email'] ?? email,
-          diamonds: (data['diamonds'] ?? 0) as int,
+          diamonds: _readInt(data['diamonds'], 0),
+          bestScore: _readInt(data['bestScore'], 0),
+          lastScore: _readInt(data['lastScore'], 0),
+          ownedFrontSets: ownedFront,
+          ownedBackSkins: ownedBack,
+          currentFrontSet: currentFront,
+          currentBackSkin: currentBack,
           role: _parseRole(data['role']),
         );
       }
@@ -43,6 +56,12 @@ class AuthRepository {
         username: email.split('@').first,
         email: email,
         diamonds: 0,
+        bestScore: 0,
+        lastScore: 0,
+        ownedFrontSets: const ['emoji'],
+        ownedBackSkins: const ['default'],
+        currentFrontSet: 'emoji',
+        currentBackSkin: 'default',
         role: UserRole.user,
       );
     });
@@ -69,6 +88,12 @@ class AuthRepository {
         'email': email,
         'role': 'user',
         'diamonds': 100,
+        'bestScore': 0,
+        'lastScore': 0,
+        'ownedFrontSets': ['emoji'],
+        'ownedBackSkins': ['default'],
+        'currentFrontSet': 'emoji',
+        'currentBackSkin': 'default',
         'createdAt': FieldValue.serverTimestamp(),
       });
       return UserModel(
@@ -76,6 +101,12 @@ class AuthRepository {
         username: username,
         email: email,
         diamonds: 100,
+        bestScore: 0,
+        lastScore: 0,
+        ownedFrontSets: const ['emoji'],
+        ownedBackSkins: const ['default'],
+        currentFrontSet: 'emoji',
+        currentBackSkin: 'default',
         role: UserRole.user,
       );
     });
@@ -90,5 +121,22 @@ class AuthRepository {
     if (role == 'admin') return UserRole.admin;
     if (role == 'guest') return UserRole.guest;
     return UserRole.user;
+  }
+
+  int _readInt(dynamic value, int fallback) {
+    if (value is num) return value.toInt();
+    return fallback;
+  }
+
+  String _readString(dynamic value, String fallback) {
+    if (value is String && value.isNotEmpty) return value;
+    return fallback;
+  }
+
+  List<String> _readList(dynamic value, List<String> fallback) {
+    if (value is Iterable) {
+      return value.whereType<String>().toList();
+    }
+    return fallback;
   }
 }

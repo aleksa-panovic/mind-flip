@@ -1,14 +1,26 @@
 import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/user_model.dart';
+import '../services/firebase_auth_service.dart';
+import '../services/firebase_db_service.dart';
+
 class SkinProvider extends ChangeNotifier {
-  SkinProvider() {
+  SkinProvider({
+    FirebaseDbService? firebaseDb,
+    FirebaseAuthService? firebaseAuth,
+  })  : _firebaseDb = firebaseDb,
+        _firebaseAuth = firebaseAuth {
     _load();
   }
 
+  final FirebaseDbService? _firebaseDb;
+  final FirebaseAuthService? _firebaseAuth;
+
   String currentFrontSet = 'emoji';
   String currentBackSkin = 'default';
-  int diamonds = 2450;
+  int diamonds = 100;
 
   final Set<String> ownedFrontSets = {'emoji'};
   final Set<String> ownedBackSkins = {'default'};
@@ -126,6 +138,36 @@ class SkinProvider extends ChangeNotifier {
     return true;
   }
 
+  Future<bool> setFrontRemote(String key) async {
+    if (!setFront(key)) return false;
+    if (_firebaseDb == null || _firebaseAuth == null) return true;
+    final user = _firebaseAuth!.currentUser;
+    if (user == null) return true;
+    await _firebaseDb!.users().doc(user.uid).set(
+      {
+        'currentFrontSet': key,
+        'updatedAt': FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    );
+    return true;
+  }
+
+  Future<bool> setBackRemote(String key) async {
+    if (!setBack(key)) return false;
+    if (_firebaseDb == null || _firebaseAuth == null) return true;
+    final user = _firebaseAuth!.currentUser;
+    if (user == null) return true;
+    await _firebaseDb!.users().doc(user.uid).set(
+      {
+        'currentBackSkin': key,
+        'updatedAt': FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    );
+    return true;
+  }
+
   bool buyFront(String key, int price) {
     if (ownedFrontSets.contains(key)) return false;
     if (diamonds < price) return false;
@@ -146,10 +188,71 @@ class SkinProvider extends ChangeNotifier {
     return true;
   }
 
+  Future<bool> buyBackRemote(String key, int price) async {
+    if (_firebaseDb == null || _firebaseAuth == null) {
+      return buyBack(key, price);
+    }
+    final user = _firebaseAuth!.currentUser;
+    if (user == null) return false;
+    if (ownedBackSkins.contains(key)) return true;
+    final userRef = _firebaseDb!.users().doc(user.uid);
+    try {
+      await FirebaseFirestore.instance.runTransaction((tx) async {
+        final snap = await tx.get(userRef);
+        final data = snap.data() ?? <String, dynamic>{};
+        final current = _readInt(data['diamonds'], 0);
+        final owned = _readList(data['ownedBackSkins'], const <String>[]);
+        if (owned.contains(key)) return;
+        if (current < price) {
+          throw StateError('not-enough');
+        }
+        tx.set(
+          userRef,
+          {
+            'diamonds': current - price,
+            'ownedBackSkins': FieldValue.arrayUnion([key]),
+            'updatedAt': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
+      });
+      diamonds = (diamonds - price).clamp(0, 1 << 31).toInt();
+      ownedBackSkins.add(key);
+      notifyListeners();
+      return true;
+    } on StateError {
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
   void addDiamonds(int amount) {
     if (amount <= 0) return;
     diamonds += amount;
     _save();
+    notifyListeners();
+  }
+
+  Future<void> addDiamondsRemote(int amount) async {
+    if (amount <= 0) return;
+    if (_firebaseDb == null || _firebaseAuth == null) {
+      addDiamonds(amount);
+      return;
+    }
+    final user = _firebaseAuth!.currentUser;
+    if (user == null) {
+      addDiamonds(amount);
+      return;
+    }
+    await _firebaseDb!.users().doc(user.uid).set(
+      {
+        'diamonds': FieldValue.increment(amount),
+        'updatedAt': FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    );
+    diamonds += amount;
     notifyListeners();
   }
 
@@ -159,9 +262,37 @@ class SkinProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void syncFromUser(UserModel user) {
+    diamonds = user.diamonds;
+    currentFrontSet = user.currentFrontSet;
+    currentBackSkin = user.currentBackSkin;
+    ownedFrontSets
+      ..clear()
+      ..addAll(user.ownedFrontSets);
+    ownedBackSkins
+      ..clear()
+      ..addAll(user.ownedBackSkins);
+    _save();
+    notifyListeners();
+  }
+
+  void resetToDefaults() {
+    diamonds = 100;
+    currentFrontSet = 'emoji';
+    currentBackSkin = 'default';
+    ownedFrontSets
+      ..clear()
+      ..add('emoji');
+    ownedBackSkins
+      ..clear()
+      ..add('default');
+    _save();
+    notifyListeners();
+  }
+
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
-    diamonds = prefs.getInt('diamonds') ?? 2450;
+    diamonds = prefs.getInt('diamonds') ?? 100;
     currentFrontSet = prefs.getString('currentFrontSet') ?? 'emoji';
     currentBackSkin = prefs.getString('currentBackSkin') ?? 'default';
     final front = prefs.getStringList('ownedFrontSets') ?? ['emoji'];
@@ -182,5 +313,17 @@ class SkinProvider extends ChangeNotifier {
     await prefs.setString('currentBackSkin', currentBackSkin);
     await prefs.setStringList('ownedFrontSets', ownedFrontSets.toList());
     await prefs.setStringList('ownedBackSkins', ownedBackSkins.toList());
+  }
+
+  int _readInt(dynamic value, int fallback) {
+    if (value is num) return value.toInt();
+    return fallback;
+  }
+
+  List<String> _readList(dynamic value, List<String> fallback) {
+    if (value is Iterable) {
+      return value.whereType<String>().toList();
+    }
+    return fallback;
   }
 }

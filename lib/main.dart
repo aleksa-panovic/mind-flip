@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import 'firebase_options.dart';
 import 'screens/splash/splash_screen.dart';
 import 'screens/home/home_guest_screen.dart';
 import 'screens/home/home_user_screen.dart';
@@ -31,7 +32,9 @@ import 'models/user_model.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MindFlipApp());
 }
 
@@ -59,11 +62,25 @@ class MindFlipApp extends StatelessWidget {
                   if (u == null) return Stream.value(null);
                   return FirebaseDbService().userStream(u.uid).map((data) {
                     if (data == null) return null;
+                    final ownedFront =
+                        _readStringList(data['ownedFrontSets'], const ['emoji']);
+                    final ownedBack =
+                        _readStringList(data['ownedBackSkins'], const ['default']);
+                    final currentFront =
+                        _readString(data['currentFrontSet'], 'emoji');
+                    final currentBack =
+                        _readString(data['currentBackSkin'], 'default');
                     return UserModel(
                       id: u.uid,
                       username: data['username'] ?? 'User',
                       email: data['email'] ?? '',
-                      diamonds: (data['diamonds'] ?? 0) as int,
+                      diamonds: _readInt(data['diamonds'], 0),
+                      bestScore: _readInt(data['bestScore'], 0),
+                      lastScore: _readInt(data['lastScore'], 0),
+                      ownedFrontSets: ownedFront,
+                      ownedBackSkins: ownedBack,
+                      currentFrontSet: currentFront,
+                      currentBackSkin: currentBack,
                       role: data['role'] == 'admin'
                           ? UserRole.admin
                           : UserRole.user,
@@ -83,7 +100,10 @@ class MindFlipApp extends StatelessWidget {
           create: (context) => GameProvider(context.read<GameRepository>()),
         ),
         ChangeNotifierProvider<SkinProvider>(
-          create: (_) => SkinProvider(),
+          create: (_) => SkinProvider(
+            firebaseDb: FirebaseDbService(),
+            firebaseAuth: FirebaseAuthService(),
+          ),
         ),
         ChangeNotifierProvider<ThemeProvider>(
           create: (_) => ThemeProvider(),
@@ -99,7 +119,9 @@ class MindFlipApp extends StatelessWidget {
               auth.setUser(fbUser);
             }
             if (fbUser != null) {
-              skin.setDiamonds(fbUser.diamonds);
+              skin.syncFromUser(fbUser);
+            } else {
+              skin.resetToDefaults();
             }
           });
           return MaterialApp(
@@ -155,4 +177,21 @@ class MindFlipApp extends StatelessWidget {
       ),
     );
   }
+}
+
+int _readInt(dynamic value, int fallback) {
+  if (value is num) return value.toInt();
+  return fallback;
+}
+
+String _readString(dynamic value, String fallback) {
+  if (value is String && value.isNotEmpty) return value;
+  return fallback;
+}
+
+List<String> _readStringList(dynamic value, List<String> fallback) {
+  if (value is Iterable) {
+    return value.whereType<String>().toList();
+  }
+  return fallback;
 }

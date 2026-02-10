@@ -38,8 +38,12 @@ class GameRepository {
     final user = _firebaseAuth!.currentUser;
     if (user == null) return;
     final uid = user.uid;
+    final userRef = _firebaseDb!.users().doc(uid);
+    final userSnap = await userRef.get();
+    final username = userSnap.data()?['username'] ?? 'User';
     final data = {
       'userId': uid,
+      'username': username,
       'score': result.score,
       'timeSeconds': result.timeSeconds,
       'moves': result.moves,
@@ -48,9 +52,7 @@ class GameRepository {
       'createdAt': FieldValue.serverTimestamp(),
     };
     await _firebaseDb!.results().add(data);
-    final userRef = _firebaseDb!.users().doc(uid);
-    final snap = await userRef.get();
-    final currentBest = (snap.data()?['bestScore'] ?? 0) as int;
+    final currentBest = (userSnap.data()?['bestScore'] ?? 0) as int;
     final nextBest = result.score > currentBest ? result.score : currentBest;
     await userRef.set(
       {

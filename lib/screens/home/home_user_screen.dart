@@ -8,6 +8,7 @@ import '../../widgets/icon_chip.dart';
 import '../../providers/skin_provider.dart';
 import '../../widgets/fade_slide_in.dart';
 import '../../providers/theme_provider.dart';
+import '../../services/firebase_db_service.dart';
 
 class HomeUserScreen extends StatelessWidget {
   const HomeUserScreen({super.key});
@@ -187,21 +188,38 @@ class _HeaderSection extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Expanded(
-                    child: StatCard(
-                      title: 'Best Score',
-                      value: '1,850',
-                      icon: Icons.star,
-                      assetPath: 'assets/icons/best_score.png',
+                  Expanded(
+                    child: Consumer<AuthProvider>(
+                      builder: (context, auth, _) {
+                        final best = auth.currentUser?.bestScore ?? 0;
+                        return StatCard(
+                          title: 'Best Score',
+                          value: best.toString(),
+                          icon: Icons.star,
+                          assetPath: 'assets/icons/best_score.png',
+                        );
+                      },
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Expanded(
-                    child: StatCard(
-                      title: 'Rank',
-                      value: '#42',
-                      icon: Icons.emoji_events,
-                      assetPath: 'assets/icons/rank.png',
+                  Expanded(
+                    child: StreamBuilder<List<Map<String, dynamic>>>(
+                      stream: FirebaseDbService().topLeaderboard(limit: 200),
+                      builder: (context, snapshot) {
+                        final data = snapshot.data ?? [];
+                        final userId =
+                            context.read<AuthProvider>().currentUser?.id;
+                        final index =
+                            data.indexWhere((e) => e['userId'] == userId);
+                        final rankLabel =
+                            index >= 0 ? '#${index + 1}' : '-';
+                        return StatCard(
+                          title: 'Rank',
+                          value: rankLabel,
+                          icon: Icons.emoji_events,
+                          assetPath: 'assets/icons/rank.png',
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -624,7 +642,7 @@ class _DailyBonusDialog extends StatelessWidget {
                 ),
                 child: ElevatedButton(
                   onPressed: () {
-                    context.read<SkinProvider>().addDiamonds(250);
+                    context.read<SkinProvider>().addDiamondsRemote(250);
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(

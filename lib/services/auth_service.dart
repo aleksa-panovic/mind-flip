@@ -11,6 +11,13 @@ class AuthService {
       id: 'u_demo',
       username: 'Alex_Pro',
       email: email,
+      diamonds: 100,
+      bestScore: 0,
+      lastScore: 0,
+      ownedFrontSets: const ['emoji'],
+      ownedBackSkins: const ['default'],
+      currentFrontSet: 'emoji',
+      currentBackSkin: 'default',
       role: UserRole.user,
     );
   }
@@ -26,6 +33,13 @@ class AuthService {
       id: 'u_demo',
       username: username,
       email: email,
+      diamonds: 100,
+      bestScore: 0,
+      lastScore: 0,
+      ownedFrontSets: const ['emoji'],
+      ownedBackSkins: const ['default'],
+      currentFrontSet: 'emoji',
+      currentBackSkin: 'default',
       role: UserRole.user,
     );
   }
